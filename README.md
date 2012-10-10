@@ -65,3 +65,15 @@ Instead of these approaches, the author wanted the simplest possible library to 
 file full of SQL (or near SQL). By defining a very simple DSL that integrates naturally into the SQL,
 both DBAs and developers can understand the same file and work with it.
 Since no such small and isolated library could be found, one was written.
+
+
+Links
+-----
+Some useful project links:
+
+* [User guide](https://github.com/OpenGamma/ElSql/wiki/User-guide) - a longer user guide on the wiki
+* [Javadoc](http://opengamma.github.com/ElSql/apidocs/index.html) - the two public classes
+* [Issue tracker](https://github.com/OpenGamma/ElSql/issues) - raise bugs or enhancement requests here
+* [Project sponsor](http://developers.opengamma.com/) - the project is supported by OpenGamma
+
+ElSql is licensed under the Apache License v2.
