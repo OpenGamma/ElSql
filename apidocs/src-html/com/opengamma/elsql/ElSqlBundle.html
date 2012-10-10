@@ -1,0 +1,314 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>/**<a name="line.1"></a>
+<span class="sourceLineNo">002</span> * Copyright (C) 2009 - present by OpenGamma Inc. and the OpenGamma group of companies<a name="line.2"></a>
+<span class="sourceLineNo">003</span> *<a name="line.3"></a>
+<span class="sourceLineNo">004</span> * Please see distribution for license.<a name="line.4"></a>
+<span class="sourceLineNo">005</span> */<a name="line.5"></a>
+<span class="sourceLineNo">006</span>package com.opengamma.elsql;<a name="line.6"></a>
+<span class="sourceLineNo">007</span><a name="line.7"></a>
+<span class="sourceLineNo">008</span>import java.io.BufferedReader;<a name="line.8"></a>
+<span class="sourceLineNo">009</span>import java.io.IOException;<a name="line.9"></a>
+<span class="sourceLineNo">010</span>import java.io.InputStream;<a name="line.10"></a>
+<span class="sourceLineNo">011</span>import java.io.InputStreamReader;<a name="line.11"></a>
+<span class="sourceLineNo">012</span>import java.util.ArrayList;<a name="line.12"></a>
+<span class="sourceLineNo">013</span>import java.util.LinkedHashMap;<a name="line.13"></a>
+<span class="sourceLineNo">014</span>import java.util.List;<a name="line.14"></a>
+<span class="sourceLineNo">015</span>import java.util.Map;<a name="line.15"></a>
+<span class="sourceLineNo">016</span><a name="line.16"></a>
+<span class="sourceLineNo">017</span>import org.springframework.core.io.ClassPathResource;<a name="line.17"></a>
+<span class="sourceLineNo">018</span>import org.springframework.core.io.Resource;<a name="line.18"></a>
+<span class="sourceLineNo">019</span>import org.springframework.jdbc.core.namedparam.SqlParameterSource;<a name="line.19"></a>
+<span class="sourceLineNo">020</span><a name="line.20"></a>
+<span class="sourceLineNo">021</span>/**<a name="line.21"></a>
+<span class="sourceLineNo">022</span> * A bundle of elsql formatted SQL.<a name="line.22"></a>
+<span class="sourceLineNo">023</span> * &lt;p&gt;<a name="line.23"></a>
+<span class="sourceLineNo">024</span> * The bundle encapsulates the SQL needed for a particular feature.<a name="line.24"></a>
+<span class="sourceLineNo">025</span> * This will typically correspond to a data access object, or set of related tables.<a name="line.25"></a>
+<span class="sourceLineNo">026</span> * &lt;p&gt;<a name="line.26"></a>
+<span class="sourceLineNo">027</span> * This class is immutable and thread-safe.<a name="line.27"></a>
+<span class="sourceLineNo">028</span> */<a name="line.28"></a>
+<span class="sourceLineNo">029</span>public final class ElSqlBundle {<a name="line.29"></a>
+<span class="sourceLineNo">030</span><a name="line.30"></a>
+<span class="sourceLineNo">031</span>  /**<a name="line.31"></a>
+<span class="sourceLineNo">032</span>   * The map of known elsql.<a name="line.32"></a>
+<span class="sourceLineNo">033</span>   */<a name="line.33"></a>
+<span class="sourceLineNo">034</span>  private final Map&lt;String, NameSqlFragment&gt; _map;<a name="line.34"></a>
+<span class="sourceLineNo">035</span>  /**<a name="line.35"></a>
+<span class="sourceLineNo">036</span>   * The config.<a name="line.36"></a>
+<span class="sourceLineNo">037</span>   */<a name="line.37"></a>
+<span class="sourceLineNo">038</span>  private final ElSqlConfig _config;<a name="line.38"></a>
+<span class="sourceLineNo">039</span><a name="line.39"></a>
+<span class="sourceLineNo">040</span>  /**<a name="line.40"></a>
+<span class="sourceLineNo">041</span>   * Loads external SQL based for the specified type.<a name="line.41"></a>
+<span class="sourceLineNo">042</span>   * &lt;p&gt;<a name="line.42"></a>
+<span class="sourceLineNo">043</span>   * The type is used to identify the location and name of the ".elsql" file.<a name="line.43"></a>
+<span class="sourceLineNo">044</span>   * The loader will attempt to find and use two files.<a name="line.44"></a>
+<span class="sourceLineNo">045</span>   * The first optional file will have the suffix "-$ConfigName.elsql" while<a name="line.45"></a>
+<span class="sourceLineNo">046</span>   * the second mandatory will just have the ".elsql" suffix.<a name="line.46"></a>
+<span class="sourceLineNo">047</span>   * &lt;p&gt;<a name="line.47"></a>
+<span class="sourceLineNo">048</span>   * The config is designed to handle some, but not all, database differences.<a name="line.48"></a>
+<span class="sourceLineNo">049</span>   * Other differences should be handled by creating and using a database specific<a name="line.49"></a>
+<span class="sourceLineNo">050</span>   * override file.<a name="line.50"></a>
+<span class="sourceLineNo">051</span>   * <a name="line.51"></a>
+<span class="sourceLineNo">052</span>   * @param config  the config, not null<a name="line.52"></a>
+<span class="sourceLineNo">053</span>   * @param type  the type, not null<a name="line.53"></a>
+<span class="sourceLineNo">054</span>   * @return the bundle, not null<a name="line.54"></a>
+<span class="sourceLineNo">055</span>   * @throws IllegalArgumentException if the input cannot be parsed<a name="line.55"></a>
+<span class="sourceLineNo">056</span>   */<a name="line.56"></a>
+<span class="sourceLineNo">057</span>  public static ElSqlBundle of(ElSqlConfig config, Class&lt;?&gt; type) {<a name="line.57"></a>
+<span class="sourceLineNo">058</span>    if (config == null) {<a name="line.58"></a>
+<span class="sourceLineNo">059</span>      throw new IllegalArgumentException("Config must not be null");<a name="line.59"></a>
+<span class="sourceLineNo">060</span>    }<a name="line.60"></a>
+<span class="sourceLineNo">061</span>    if (type == null) {<a name="line.61"></a>
+<span class="sourceLineNo">062</span>      throw new IllegalArgumentException("Type must not be null");<a name="line.62"></a>
+<span class="sourceLineNo">063</span>    }<a name="line.63"></a>
+<span class="sourceLineNo">064</span>    ClassPathResource baseResource = new ClassPathResource(type.getSimpleName() + ".elsql", type);<a name="line.64"></a>
+<span class="sourceLineNo">065</span>    ClassPathResource configResource = new ClassPathResource(type.getSimpleName() + "-" + config.getName() + ".elsql", type);<a name="line.65"></a>
+<span class="sourceLineNo">066</span>    return parse(config, baseResource, configResource);<a name="line.66"></a>
+<span class="sourceLineNo">067</span>  }<a name="line.67"></a>
+<span class="sourceLineNo">068</span><a name="line.68"></a>
+<span class="sourceLineNo">069</span>  /**<a name="line.69"></a>
+<span class="sourceLineNo">070</span>   * Parses a bundle from a resource locating a file, specify the config.<a name="line.70"></a>
+<span class="sourceLineNo">071</span>   * &lt;p&gt;<a name="line.71"></a>
+<span class="sourceLineNo">072</span>   * The config is designed to handle some, but not all, database differences.<a name="line.72"></a>
+<span class="sourceLineNo">073</span>   * <a name="line.73"></a>
+<span class="sourceLineNo">074</span>   * @param config  the config to use, not null<a name="line.74"></a>
+<span class="sourceLineNo">075</span>   * @param resources  the resources to load, not null<a name="line.75"></a>
+<span class="sourceLineNo">076</span>   * @return the external identifier, not null<a name="line.76"></a>
+<span class="sourceLineNo">077</span>   * @throws IllegalArgumentException if the input cannot be parsed<a name="line.77"></a>
+<span class="sourceLineNo">078</span>   */<a name="line.78"></a>
+<span class="sourceLineNo">079</span>  public static ElSqlBundle parse(ElSqlConfig config, Resource... resources) {<a name="line.79"></a>
+<span class="sourceLineNo">080</span>    if (config == null) {<a name="line.80"></a>
+<span class="sourceLineNo">081</span>      throw new IllegalArgumentException("Config must not be null");<a name="line.81"></a>
+<span class="sourceLineNo">082</span>    }<a name="line.82"></a>
+<span class="sourceLineNo">083</span>    if (resources == null) {<a name="line.83"></a>
+<span class="sourceLineNo">084</span>      throw new IllegalArgumentException("Resources must not be null");<a name="line.84"></a>
+<span class="sourceLineNo">085</span>    }<a name="line.85"></a>
+<span class="sourceLineNo">086</span>    return parseResource(resources, config);<a name="line.86"></a>
+<span class="sourceLineNo">087</span>  }<a name="line.87"></a>
+<span class="sourceLineNo">088</span><a name="line.88"></a>
+<span class="sourceLineNo">089</span>  private static ElSqlBundle parseResource(Resource[] resources, ElSqlConfig config) {<a name="line.89"></a>
+<span class="sourceLineNo">090</span>    List&lt;List&lt;String&gt;&gt; files = new ArrayList&lt;List&lt;String&gt;&gt;();<a name="line.90"></a>
+<span class="sourceLineNo">091</span>    for (Resource resource : resources) {<a name="line.91"></a>
+<span class="sourceLineNo">092</span>      if (resource.exists()) {<a name="line.92"></a>
+<span class="sourceLineNo">093</span>        List&lt;String&gt; lines = loadResource(resource);<a name="line.93"></a>
+<span class="sourceLineNo">094</span>        files.add(lines);<a name="line.94"></a>
+<span class="sourceLineNo">095</span>      }<a name="line.95"></a>
+<span class="sourceLineNo">096</span>    }<a name="line.96"></a>
+<span class="sourceLineNo">097</span>    return parse(files, config);<a name="line.97"></a>
+<span class="sourceLineNo">098</span>  }<a name="line.98"></a>
+<span class="sourceLineNo">099</span><a name="line.99"></a>
+<span class="sourceLineNo">100</span>  // package scoped for testing<a name="line.100"></a>
+<span class="sourceLineNo">101</span>  static ElSqlBundle parse(List&lt;String&gt; lines) {<a name="line.101"></a>
+<span class="sourceLineNo">102</span>    ArrayList&lt;List&lt;String&gt;&gt; files = new ArrayList&lt;List&lt;String&gt;&gt;();<a name="line.102"></a>
+<span class="sourceLineNo">103</span>    files.add(lines);<a name="line.103"></a>
+<span class="sourceLineNo">104</span>    return parse(files, ElSqlConfig.DEFAULT);<a name="line.104"></a>
+<span class="sourceLineNo">105</span>  }<a name="line.105"></a>
+<span class="sourceLineNo">106</span><a name="line.106"></a>
+<span class="sourceLineNo">107</span>  private static ElSqlBundle parse(List&lt;List&lt;String&gt;&gt; files, ElSqlConfig config) {<a name="line.107"></a>
+<span class="sourceLineNo">108</span>    Map&lt;String, NameSqlFragment&gt; parsed = new LinkedHashMap&lt;String, NameSqlFragment&gt;();<a name="line.108"></a>
+<span class="sourceLineNo">109</span>    for (List&lt;String&gt; lines : files) {<a name="line.109"></a>
+<span class="sourceLineNo">110</span>      ElSqlParser parser = new ElSqlParser(lines);<a name="line.110"></a>
+<span class="sourceLineNo">111</span>      parsed.putAll(parser.parse());<a name="line.111"></a>
+<span class="sourceLineNo">112</span>    }<a name="line.112"></a>
+<span class="sourceLineNo">113</span>    return new ElSqlBundle(parsed, config);<a name="line.113"></a>
+<span class="sourceLineNo">114</span>  }<a name="line.114"></a>
+<span class="sourceLineNo">115</span><a name="line.115"></a>
+<span class="sourceLineNo">116</span>  private static List&lt;String&gt; loadResource(Resource resource) {<a name="line.116"></a>
+<span class="sourceLineNo">117</span>    InputStream in = null;<a name="line.117"></a>
+<span class="sourceLineNo">118</span>    try {<a name="line.118"></a>
+<span class="sourceLineNo">119</span>      in = resource.getInputStream();<a name="line.119"></a>
+<span class="sourceLineNo">120</span>      BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));<a name="line.120"></a>
+<span class="sourceLineNo">121</span>      List&lt;String&gt; list = new ArrayList&lt;String&gt;();<a name="line.121"></a>
+<span class="sourceLineNo">122</span>      String line = reader.readLine();<a name="line.122"></a>
+<span class="sourceLineNo">123</span>      while (line != null) {<a name="line.123"></a>
+<span class="sourceLineNo">124</span>          list.add(line);<a name="line.124"></a>
+<span class="sourceLineNo">125</span>          line = reader.readLine();<a name="line.125"></a>
+<span class="sourceLineNo">126</span>      }<a name="line.126"></a>
+<span class="sourceLineNo">127</span>      return list;<a name="line.127"></a>
+<span class="sourceLineNo">128</span>    } catch (IOException ex) {<a name="line.128"></a>
+<span class="sourceLineNo">129</span>      throw new RuntimeException(ex);<a name="line.129"></a>
+<span class="sourceLineNo">130</span>    } finally {<a name="line.130"></a>
+<span class="sourceLineNo">131</span>      try {<a name="line.131"></a>
+<span class="sourceLineNo">132</span>        if (in != null) {<a name="line.132"></a>
+<span class="sourceLineNo">133</span>          in.close();<a name="line.133"></a>
+<span class="sourceLineNo">134</span>        }<a name="line.134"></a>
+<span class="sourceLineNo">135</span>      } catch (IOException ignored) {<a name="line.135"></a>
+<span class="sourceLineNo">136</span>      }<a name="line.136"></a>
+<span class="sourceLineNo">137</span>    }<a name="line.137"></a>
+<span class="sourceLineNo">138</span>  }<a name="line.138"></a>
+<span class="sourceLineNo">139</span><a name="line.139"></a>
+<span class="sourceLineNo">140</span>  /**<a name="line.140"></a>
+<span class="sourceLineNo">141</span>   * Creates an instance..<a name="line.141"></a>
+<span class="sourceLineNo">142</span>   * <a name="line.142"></a>
+<span class="sourceLineNo">143</span>   * @param map  the map of names, not null<a name="line.143"></a>
+<span class="sourceLineNo">144</span>   * @param config  the config to use, not null<a name="line.144"></a>
+<span class="sourceLineNo">145</span>   */<a name="line.145"></a>
+<span class="sourceLineNo">146</span>  private ElSqlBundle(Map&lt;String, NameSqlFragment&gt; map, ElSqlConfig config) {<a name="line.146"></a>
+<span class="sourceLineNo">147</span>    if (map == null) {<a name="line.147"></a>
+<span class="sourceLineNo">148</span>      throw new IllegalArgumentException("Fragment map must not be null");<a name="line.148"></a>
+<span class="sourceLineNo">149</span>    }<a name="line.149"></a>
+<span class="sourceLineNo">150</span>    if (config == null) {<a name="line.150"></a>
+<span class="sourceLineNo">151</span>      throw new IllegalArgumentException("Config must not be null");<a name="line.151"></a>
+<span class="sourceLineNo">152</span>    }<a name="line.152"></a>
+<span class="sourceLineNo">153</span>    _map = map;<a name="line.153"></a>
+<span class="sourceLineNo">154</span>    _config = config;<a name="line.154"></a>
+<span class="sourceLineNo">155</span>  }<a name="line.155"></a>
+<span class="sourceLineNo">156</span><a name="line.156"></a>
+<span class="sourceLineNo">157</span>  //-------------------------------------------------------------------------<a name="line.157"></a>
+<span class="sourceLineNo">158</span>  /**<a name="line.158"></a>
+<span class="sourceLineNo">159</span>   * Gets the config.<a name="line.159"></a>
+<span class="sourceLineNo">160</span>   * <a name="line.160"></a>
+<span class="sourceLineNo">161</span>   * @return the config, not null<a name="line.161"></a>
+<span class="sourceLineNo">162</span>   */<a name="line.162"></a>
+<span class="sourceLineNo">163</span>  public ElSqlConfig getConfig() {<a name="line.163"></a>
+<span class="sourceLineNo">164</span>    return _config;<a name="line.164"></a>
+<span class="sourceLineNo">165</span>  }<a name="line.165"></a>
+<span class="sourceLineNo">166</span><a name="line.166"></a>
+<span class="sourceLineNo">167</span>  /**<a name="line.167"></a>
+<span class="sourceLineNo">168</span>   * Gets SQL for a named fragment key.<a name="line.168"></a>
+<span class="sourceLineNo">169</span>   * <a name="line.169"></a>
+<span class="sourceLineNo">170</span>   * @param config  the new config, not null<a name="line.170"></a>
+<span class="sourceLineNo">171</span>   * @return a bundle with the config updated, not null<a name="line.171"></a>
+<span class="sourceLineNo">172</span>   */<a name="line.172"></a>
+<span class="sourceLineNo">173</span>  public ElSqlBundle withConfig(ElSqlConfig config) {<a name="line.173"></a>
+<span class="sourceLineNo">174</span>    return new ElSqlBundle(_map, config);<a name="line.174"></a>
+<span class="sourceLineNo">175</span>  }<a name="line.175"></a>
+<span class="sourceLineNo">176</span><a name="line.176"></a>
+<span class="sourceLineNo">177</span>  //-------------------------------------------------------------------------<a name="line.177"></a>
+<span class="sourceLineNo">178</span>  /**<a name="line.178"></a>
+<span class="sourceLineNo">179</span>   * Gets SQL for a named fragment key, without specifying parameters.<a name="line.179"></a>
+<span class="sourceLineNo">180</span>   * &lt;p&gt;<a name="line.180"></a>
+<span class="sourceLineNo">181</span>   * Note that if the SQL contains tags that depend on variables, like AND or LIKE,<a name="line.181"></a>
+<span class="sourceLineNo">182</span>   * then an error will be thrown.<a name="line.182"></a>
+<span class="sourceLineNo">183</span>   * <a name="line.183"></a>
+<span class="sourceLineNo">184</span>   * @param name  the name, not null<a name="line.184"></a>
+<span class="sourceLineNo">185</span>   * @return the SQL, not null<a name="line.185"></a>
+<span class="sourceLineNo">186</span>   * @throws IllegalArgumentException if there is no fragment with the specified name<a name="line.186"></a>
+<span class="sourceLineNo">187</span>   * @throws RuntimeException if a problem occurs<a name="line.187"></a>
+<span class="sourceLineNo">188</span>   */<a name="line.188"></a>
+<span class="sourceLineNo">189</span>  public String getSql(String name) {<a name="line.189"></a>
+<span class="sourceLineNo">190</span>    return getSql(name, new SqlParameterSource() {<a name="line.190"></a>
+<span class="sourceLineNo">191</span>      @Override<a name="line.191"></a>
+<span class="sourceLineNo">192</span>      public boolean hasValue(String field) {<a name="line.192"></a>
+<span class="sourceLineNo">193</span>        return false;<a name="line.193"></a>
+<span class="sourceLineNo">194</span>      }<a name="line.194"></a>
+<span class="sourceLineNo">195</span>      @Override<a name="line.195"></a>
+<span class="sourceLineNo">196</span>      public int getSqlType(String field) {<a name="line.196"></a>
+<span class="sourceLineNo">197</span>        return TYPE_UNKNOWN;<a name="line.197"></a>
+<span class="sourceLineNo">198</span>      }<a name="line.198"></a>
+<span class="sourceLineNo">199</span>      @Override<a name="line.199"></a>
+<span class="sourceLineNo">200</span>      public String getTypeName(String field) {<a name="line.200"></a>
+<span class="sourceLineNo">201</span>        throw new IllegalArgumentException();<a name="line.201"></a>
+<span class="sourceLineNo">202</span>      }<a name="line.202"></a>
+<span class="sourceLineNo">203</span>      @Override<a name="line.203"></a>
+<span class="sourceLineNo">204</span>      public Object getValue(String field) throws IllegalArgumentException {<a name="line.204"></a>
+<span class="sourceLineNo">205</span>        return null;<a name="line.205"></a>
+<span class="sourceLineNo">206</span>      }<a name="line.206"></a>
+<span class="sourceLineNo">207</span>    });<a name="line.207"></a>
+<span class="sourceLineNo">208</span>  }<a name="line.208"></a>
+<span class="sourceLineNo">209</span><a name="line.209"></a>
+<span class="sourceLineNo">210</span>  /**<a name="line.210"></a>
+<span class="sourceLineNo">211</span>   * Gets SQL for a named fragment key.<a name="line.211"></a>
+<span class="sourceLineNo">212</span>   * <a name="line.212"></a>
+<span class="sourceLineNo">213</span>   * @param name  the name, not null<a name="line.213"></a>
+<span class="sourceLineNo">214</span>   * @param paramSource  the Spring SQL parameters, not null<a name="line.214"></a>
+<span class="sourceLineNo">215</span>   * @return the SQL, not null<a name="line.215"></a>
+<span class="sourceLineNo">216</span>   * @throws IllegalArgumentException if there is no fragment with the specified name<a name="line.216"></a>
+<span class="sourceLineNo">217</span>   * @throws RuntimeException if a problem occurs<a name="line.217"></a>
+<span class="sourceLineNo">218</span>   */<a name="line.218"></a>
+<span class="sourceLineNo">219</span>  public String getSql(String name, SqlParameterSource paramSource) {<a name="line.219"></a>
+<span class="sourceLineNo">220</span>    NameSqlFragment fragment = getFragment(name);<a name="line.220"></a>
+<span class="sourceLineNo">221</span>    StringBuilder buf = new StringBuilder(1024);<a name="line.221"></a>
+<span class="sourceLineNo">222</span>    fragment.toSQL(buf, this, paramSource);<a name="line.222"></a>
+<span class="sourceLineNo">223</span>    return buf.toString();<a name="line.223"></a>
+<span class="sourceLineNo">224</span>  }<a name="line.224"></a>
+<span class="sourceLineNo">225</span><a name="line.225"></a>
+<span class="sourceLineNo">226</span>  //-------------------------------------------------------------------------<a name="line.226"></a>
+<span class="sourceLineNo">227</span>  /**<a name="line.227"></a>
+<span class="sourceLineNo">228</span>   * Gets a fragment by name.<a name="line.228"></a>
+<span class="sourceLineNo">229</span>   * <a name="line.229"></a>
+<span class="sourceLineNo">230</span>   * @param name  the name, not null<a name="line.230"></a>
+<span class="sourceLineNo">231</span>   * @return the fragment, not null<a name="line.231"></a>
+<span class="sourceLineNo">232</span>   * @throws IllegalArgumentException if there is no fragment with the specified name<a name="line.232"></a>
+<span class="sourceLineNo">233</span>   */<a name="line.233"></a>
+<span class="sourceLineNo">234</span>  NameSqlFragment getFragment(String name) {<a name="line.234"></a>
+<span class="sourceLineNo">235</span>    NameSqlFragment fragment = _map.get(name);<a name="line.235"></a>
+<span class="sourceLineNo">236</span>    if (fragment == null) {<a name="line.236"></a>
+<span class="sourceLineNo">237</span>      throw new IllegalArgumentException("Unknown fragment name: " + name);<a name="line.237"></a>
+<span class="sourceLineNo">238</span>    }<a name="line.238"></a>
+<span class="sourceLineNo">239</span>    return fragment;<a name="line.239"></a>
+<span class="sourceLineNo">240</span>  }<a name="line.240"></a>
+<span class="sourceLineNo">241</span><a name="line.241"></a>
+<span class="sourceLineNo">242</span>}<a name="line.242"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>

@@ -7,6 +7,6 @@ ElSql documentation
 
 [User guide](userguide.html)
 
-[Javadoc]()
+[Javadoc](apidocs/index.html)
 
 [Issues](https://github.com/OpenGamma/ElSql/issues)
