@@ -1,3 +1,7 @@
+---
+title: ElSQl documentation
+---
+
 ElSql documentation
 ===================
 

@@ -1,3 +1,7 @@
+---
+title: ElSQl user guide
+---
+
 User guide
 ==========
 
