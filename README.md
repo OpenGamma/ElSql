@@ -24,7 +24,7 @@ The key benefit is a simple external file that a DBA can understand, something
 which is invaluable for later maintenance and debugging.
 
 The file format is essentially a DSL with a very small number of tags that handle the
-majority of common difficult cases. It has the suffix ".elsql":
+majority of common difficult cases. It typically has the suffix ".elsql":
 
      -- an example comment
      @NAME(SelectBlogs)
