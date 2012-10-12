@@ -19,7 +19,6 @@ The main techniques are:
 
 This library focuses on the last of these - using an external file.
 It is designed for use with Spring, and uses the Spring SqlParameterSource class.
-
 The key benefit is a simple external file that a DBA can understand, something
 which is invaluable for later maintenance and debugging.
 
@@ -28,11 +27,15 @@ common difficult cases. The file has the suffix ".elsql":
 
      -- an example comment
      @NAME(SelectBlogs)
-       SELECT @INCLUDE(CommonFields)
-       FROM blogs
-       WHERE id = :id
-         @AND(:date)
-           date > :date
+       @PAGING(:paging_offset,:paging_fetch)
+         SELECT @INCLUDE(CommonFields)
+         FROM blogs
+         WHERE id = :id
+           @AND(:date)
+             date > :date
+           @AND(:active)
+             active = :active
+         ORDER BY title, author
      @NAME(CommonFields)
        title, author, content
 
