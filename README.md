@@ -68,6 +68,10 @@ file full of SQL (or near SQL). By defining a very simple DSL that integrates na
 both DBAs and developers can understand the same file and work with it.
 Since no such small and isolated library could be found, one was written.
 
+Bear in mind however, that ElSql requires developers to (a) know SQL and (b) write the logic to
+convert objects to and from JDBC. The solution is not for everyone, but if you need the ability
+to control your SQL fully, potentially across multiple databases, then it may be the solution for you.
+
 
 Links
 -----
