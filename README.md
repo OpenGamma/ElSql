@@ -24,7 +24,7 @@ The key benefit is a simple external file that a DBA can understand, something
 which is invaluable for later maintenance and debugging.
 
 The file format is essentially a DSL with a very small number of tags that handle the
-majority of common difficult cases. It typically has the suffix ".elsql":
+common difficult cases. The file has the suffix ".elsql":
 
      -- an example comment
      @NAME(SelectBlogs)
@@ -36,6 +36,7 @@ majority of common difficult cases. It typically has the suffix ".elsql":
      @NAME(CommonFields)
        title, author, content
 
+* the application looks up and refers to the "SelectBlogs" block of external SQL
 * two dashes are used for comments
 * tags start with the @ symbol
 * the primary blocks are @NAME(name) - the name refers to the block
@@ -45,7 +46,8 @@ majority of common difficult cases. It typically has the suffix ".elsql":
 
 It is not intended that the DSL format should handle all cases, as that would be too complex.
 The most complex cases should probably be dealt with in normal Java code.
-The file can also be overridden in parts, which allows weird database SQL syntaxes to be handled.
+The file can also be [overridden in parts](https://github.com/OpenGamma/ElSql/wiki/Configuration),
+which allows weird database SQL syntaxes to be handled.
 
 
 Motivation
