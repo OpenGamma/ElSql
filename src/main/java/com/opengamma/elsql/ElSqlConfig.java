@@ -37,7 +37,7 @@ public class ElSqlConfig {
   /**
    * A constant for the config needed for Vertica.
    */
-  public static final ElSqlConfig VERTICA = new ElSqlConfig("Vertica");
+  public static final ElSqlConfig VERTICA = new VerticaElSqlConfig();
 
   /**
    * The descriptive name.
@@ -160,19 +160,6 @@ public class ElSqlConfig {
     public PostgresElSqlConfig() {
       super("Postgres");
     }
-//    @Override
-//    public String addPaging(String selectToPage, int offset, int fetchLimit) {
-//      if (fetchLimit == 0 && offset == 0) {
-//        return selectToPage;
-//      }
-//      int start = offset + 1;
-//      int end = offset + fetchLimit;
-//      String columns = StringUtils.substringBetween(selectToPage, "SELECT ", " FROM ");
-//      String from = StringUtils.substringBetween(selectToPage, " FROM ", " ORDER BY ");
-//      String order = StringUtils.substringAfterLast(selectToPage, " ORDER BY ");
-//      String inner = "SELECT " + columns + ", ROW_NUMBER() OVER (ORDER BY " + order.trim() + ") AS ROW_NUM FROM " + from;
-//      return "SELECT * FROM (" + inner + ") AS ROW_TABLE WHERE ROW_NUM >= " + start + " AND ROW_NUM <= " + end;
-//    }
   }
 
   //-------------------------------------------------------------------------
@@ -237,6 +224,16 @@ public class ElSqlConfig {
     @Override
     public String getPaging(int offset, int fetchLimit) {
       throw new UnsupportedOperationException();
+    }
+  }
+
+  //-------------------------------------------------------------------------
+  /**
+   * Class for Vertica.
+   */
+  private static class VerticaElSqlConfig extends ElSqlConfig {
+    public VerticaElSqlConfig() {
+      super("Vertica");
     }
   }
 
