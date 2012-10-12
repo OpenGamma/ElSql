@@ -6,8 +6,9 @@
 package com.opengamma.elsql;
 
 /**
- * Configuration to allow details of the substitutions to be replaced.
+ * Configuration that provides support for differences between databases.
  * <p>
+ * The class provides SQL fragments that the tags use to build the complete SQL.
  * Some standard implementations have been provided, but subclasses may be added.
  * <p>
  * Implementations must be thread-safe.
@@ -15,27 +16,28 @@ package com.opengamma.elsql;
 public class ElSqlConfig {
 
   /**
-   * A constant for the standard set of config.
+   * A constant for the standard set of config, based on ANSI SQL.
    */
   public static final ElSqlConfig DEFAULT = new ElSqlConfig("Default");
   /**
-   * A constant for the config needed for Postgres.
+   * A constant for the config needed for Postgres, the same as {@code DEFAULT}.
    */
   public static final ElSqlConfig POSTGRES = new PostgresElSqlConfig();
   /**
-   * A constant for the config needed for HSQL.
+   * A constant for the config needed for HSQL, which escapes the LIKE clause.
    */
   public static final ElSqlConfig HSQL = new HsqlElSqlConfig();
   /**
-   * A constant for the config needed for MySQL.
+   * A constant for the config needed for MySQL, which uses LIMIT-OFFSET instead
+   * of FETCH-OFFSET.
    */
   public static final ElSqlConfig MYSQL = new MySqlElSqlConfig();
   /**
-   * A constant for the config needed for SQL Server 2008.
+   * A constant for the config needed for SQL Server 2008, which pages in a different way.
    */
   public static final ElSqlConfig SQL_SERVER_2008 = new SqlServer2008ElSqlConfig();
   /**
-   * A constant for the config needed for Vertica.
+   * A constant for the config needed for Vertica, the same as {@code DEFAULT}.
    */
   public static final ElSqlConfig VERTICA = new VerticaElSqlConfig();
 
