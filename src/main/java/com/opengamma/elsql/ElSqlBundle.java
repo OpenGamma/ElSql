@@ -41,13 +41,17 @@ public final class ElSqlBundle {
    * Loads external SQL based for the specified type.
    * <p>
    * The type is used to identify the location and name of the ".elsql" file.
-   * The loader will attempt to find and use two files.
-   * The first optional file will have the suffix "-$ConfigName.elsql" while
-   * the second mandatory will just have the ".elsql" suffix.
+   * The loader will attempt to find and use two files, using the full name of
+   * the type to query the class path for resources.
+   * <p>
+   * The first resource searched for is optional - the file will have the suffix
+   * "-ConfigName.elsql", such as "com/foo/Bar-MySql.elsql".
+   * The second resource searched for is mandatory - the file will just have the
+   * ".elsql" suffix, such as "com/foo/Bar.elsql".
    * <p>
    * The config is designed to handle some, but not all, database differences.
    * Other differences should be handled by creating and using a database specific
-   * override file.
+   * override file (the first optional resource is the override file).
    * 
    * @param config  the config, not null
    * @param type  the type, not null
@@ -69,7 +73,11 @@ public final class ElSqlBundle {
   /**
    * Parses a bundle from a resource locating a file, specify the config.
    * <p>
+   * This parses a list of resources. Named blocks in later resources override
+   * blocks with the same name in earlier resources.
+   * <p>
    * The config is designed to handle some, but not all, database differences.
+   * Other differences are handled via the override resources passed in.
    * 
    * @param config  the config to use, not null
    * @param resources  the resources to load, not null
@@ -156,7 +164,7 @@ public final class ElSqlBundle {
 
   //-------------------------------------------------------------------------
   /**
-   * Gets the config.
+   * Gets the configuration object.
    * 
    * @return the config, not null
    */
@@ -165,7 +173,9 @@ public final class ElSqlBundle {
   }
 
   /**
-   * Gets SQL for a named fragment key.
+   * Returns a copy of this bundle with a different configuration.
+   * <p>
+   * This does not reload the underlying resources.
    * 
    * @param config  the new config, not null
    * @return a bundle with the config updated, not null
@@ -176,8 +186,9 @@ public final class ElSqlBundle {
 
   //-------------------------------------------------------------------------
   /**
-   * Gets SQL for a named fragment key, without specifying parameters.
+   * Finds SQL for a named fragment key, without specifying parameters.
    * <p>
+   * This finds, processes and returns a named block from the bundle.
    * Note that if the SQL contains tags that depend on variables, like AND or LIKE,
    * then an error will be thrown.
    * 
@@ -187,28 +198,13 @@ public final class ElSqlBundle {
    * @throws RuntimeException if a problem occurs
    */
   public String getSql(String name) {
-    return getSql(name, new SqlParameterSource() {
-      @Override
-      public boolean hasValue(String field) {
-        return false;
-      }
-      @Override
-      public int getSqlType(String field) {
-        return TYPE_UNKNOWN;
-      }
-      @Override
-      public String getTypeName(String field) {
-        throw new IllegalArgumentException();
-      }
-      @Override
-      public Object getValue(String field) throws IllegalArgumentException {
-        return null;
-      }
-    });
+    return getSql(name, new EmptySource());
   }
 
   /**
-   * Gets SQL for a named fragment key.
+   * Finds SQL for a named fragment key.
+   * <p>
+   * This finds, processes and returns a named block from the bundle.
    * 
    * @param name  the name, not null
    * @param paramSource  the Spring SQL parameters, not null
@@ -237,6 +233,33 @@ public final class ElSqlBundle {
       throw new IllegalArgumentException("Unknown fragment name: " + name);
     }
     return fragment;
+  }
+
+  //-------------------------------------------------------------------------
+  /**
+   * An empty parameter source.
+   * Using this reduces coupling with the Spring librray.
+   */
+  private final class EmptySource implements SqlParameterSource {
+    @Override
+    public boolean hasValue(String field) {
+      return false;
+    }
+  
+    @Override
+    public int getSqlType(String field) {
+      return TYPE_UNKNOWN;
+    }
+  
+    @Override
+    public String getTypeName(String field) {
+      throw new IllegalArgumentException();
+    }
+  
+    @Override
+    public Object getValue(String field) throws IllegalArgumentException {
+      return null;
+    }
   }
 
 }
