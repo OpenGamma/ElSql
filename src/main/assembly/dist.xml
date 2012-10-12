@@ -1,0 +1,27 @@
+<assembly>
+    <id>dist</id>
+    <formats>
+        <format>tar.gz</format>
+        <format>zip</format>
+    </formats>
+    <baseDirectory>${artifactId}-${version}</baseDirectory>
+    <fileSets>
+        <fileSet>
+            <includes>
+                <include>LICENSE.txt</include>
+                <include>pom.xml</include>
+                <include>RELEASE-NOTES.txt</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>src</directory>
+        </fileSet>
+        <fileSet>
+            <directory>target</directory>
+            <outputDirectory></outputDirectory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>
