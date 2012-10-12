@@ -77,7 +77,8 @@ Links
 -----
 Some useful project links:
 
-* [User guide](https://github.com/OpenGamma/ElSql/wiki/User-guide) - a longer user guide on the wiki
+* [User guide](https://github.com/OpenGamma/ElSql/wiki/User-guide) - a longer user guide
+* [Wiki](https://github.com/OpenGamma/ElSql/wiki/Home) including an [example](https://github.com/OpenGamma/ElSql/wiki/Example)
 * [Javadoc](http://opengamma.github.com/ElSql/apidocs/index.html) - the two public classes
 * [Issue tracker](https://github.com/OpenGamma/ElSql/issues) - raise bugs or enhancement requests here
 * [Project sponsor](http://developers.opengamma.com/) - the project is supported by OpenGamma
