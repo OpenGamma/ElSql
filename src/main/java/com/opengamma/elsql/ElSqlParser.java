@@ -86,12 +86,20 @@ final class ElSqlParser {
   }
 
   //-------------------------------------------------------------------------
+  /**
+   * Parse the input returning the named sections.
+   * 
+   * @return the map of named sections, keyed by name, not null
+   */
   Map<String, NameSqlFragment> parse() {
     rejectTabs();
     parseNamedSections();
     return _namedFragments;
   }
 
+  /**
+   * Ensure that there are no tabs.
+   */
   private void rejectTabs() {
     for (Line line : _lines) {
       if (line.containsTab()) {
@@ -100,11 +108,23 @@ final class ElSqlParser {
     }
   }
 
+  /**
+   * Parses the top-level named sections.
+   */
   private void parseNamedSections() {
     ContainerSqlFragment containerFragment = new ContainerSqlFragment();
     parseContainerSection(containerFragment, _lines.listIterator(), -1);
   }
 
+  /**
+   * Parses a container section.
+   * <p>
+   * A container is any section indented to the same amount.
+   * 
+   * @param container  the container to add to, not null
+   * @param lineIterator  the iterator, not null
+   * @param indent  the current indent, negative if no indent
+   */
   private void parseContainerSection(ContainerSqlFragment container, ListIterator<Line> lineIterator, int indent) {
     while (lineIterator.hasNext()) {
       Line line = lineIterator.next();
@@ -198,6 +218,12 @@ final class ElSqlParser {
     }
   }
 
+  /**
+   * Extracts a variable from the input.
+   * 
+   * @param text  the text to parse, may be null
+   * @return the variable, null if none
+   */
   private String extractVariable(String text) {
     if (text == null) {
       return null;
@@ -209,6 +235,12 @@ final class ElSqlParser {
     return text;
   }
 
+  /**
+   * Parses a single line, or remainder of a line.
+   * 
+   * @param container  the container to add to, not null
+   * @param line  the line to parse, not null
+   */
   private void parseLine(ContainerSqlFragment container, Line line) {
     String trimmed = line.lineTrimmed();
     if (trimmed.length() == 0) {
@@ -235,6 +267,17 @@ final class ElSqlParser {
     }
   }
 
+  /**
+   * Parse INCLUDE tag.
+   * <p>
+   * This tag can appear anywhere in a line.
+   * It substitutes the entire content of the named section in at this point.
+   * The text before is treated as simple text.
+   * The text after is parsed.
+   * 
+   * @param container  the container to add to, not null
+   * @param line  the line to parse, not null
+   */
   private void parseIncludeTag(ContainerSqlFragment container, Line line) {
     String trimmed = line.lineTrimmed();
     int pos = trimmed.indexOf("@INCLUDE");
@@ -252,6 +295,16 @@ final class ElSqlParser {
     parseLine(container, subLine);
   }
 
+  /**
+   * Parse LIKE/ENDLIKE tag.
+   * <p>
+   * This tag can appear anywhere in a line.
+   * The text before is treated as simple text.
+   * The text after is parsed.
+   * 
+   * @param container  the container to add to, not null
+   * @param line  the line to parse, not null
+   */
   private void parseLikeTag(ContainerSqlFragment container, Line line) {
     String trimmed = line.lineTrimmed();
     int pos = trimmed.indexOf("@LIKE");
@@ -278,6 +331,16 @@ final class ElSqlParser {
     parseLine(container, subLine);
   }
 
+  /**
+   * Parse OFFSET/FETCH tag.
+   * <p>
+   * This tag can appear anywhere in a line.
+   * The text before is treated as simple text.
+   * The text after is parsed.
+   * 
+   * @param container  the container to add to, not null
+   * @param line  the line to parse, not null
+   */
   private void parseOffsetFetchTag(ContainerSqlFragment container, Line line) {
     String trimmed = line.lineTrimmed();
     int pos = trimmed.indexOf("@OFFSETFETCH");
@@ -302,6 +365,16 @@ final class ElSqlParser {
     parseLine(container, subLine);
   }
 
+  /**
+   * Parse FETCH tag.
+   * <p>
+   * This tag can appear anywhere in a line.
+   * The text before is treated as simple text.
+   * The text after is parsed.
+   * 
+   * @param container  the container to add to, not null
+   * @param line  the line to parse, not null
+   */
   private void parseFetchTag(ContainerSqlFragment container, Line line) {
     String trimmed = line.lineTrimmed();
     int pos = trimmed.indexOf("@FETCH");
@@ -330,6 +403,9 @@ final class ElSqlParser {
   }
 
   //-------------------------------------------------------------------------
+  /**
+   * Representation of a single line in the input.
+   */
   static final class Line {
     private final String _line;
     private final String _trimmed;
