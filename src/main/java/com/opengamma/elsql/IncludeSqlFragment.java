@@ -37,7 +37,7 @@ final class IncludeSqlFragment extends SqlFragment {
    * 
    * @return the include key, not null
    */
-  public String getIncludeKey() {
+  String getIncludeKey() {
     return _includeKey;
   }
 

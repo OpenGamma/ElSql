@@ -33,7 +33,7 @@ class ContainerSqlFragment extends SqlFragment {
    * 
    * @param childFragment  the child fragment, not null
    */
-  public void addFragment(SqlFragment childFragment) {
+  void addFragment(SqlFragment childFragment) {
     _fragments.add(childFragment);
   }
 
@@ -42,7 +42,7 @@ class ContainerSqlFragment extends SqlFragment {
    * 
    * @return the unmodifiable list of fragments, not null
    */
-  public List<SqlFragment> getFragments() {
+  List<SqlFragment> getFragments() {
     return Collections.unmodifiableList(_fragments);
   }
 

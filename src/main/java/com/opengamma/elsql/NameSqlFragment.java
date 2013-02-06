@@ -27,7 +27,7 @@ final class NameSqlFragment extends ContainerSqlFragment {
    * 
    * @return the name, not null
    */
-  public String getName() {
+  String getName() {
     return _name;
   }
 

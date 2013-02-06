@@ -44,7 +44,7 @@ abstract class ConditionalSqlFragment extends ContainerSqlFragment {
    * 
    * @return the variable, not null
    */
-  public String getVariable() {
+  String getVariable() {
     return _variable;
   }
 
@@ -53,7 +53,7 @@ abstract class ConditionalSqlFragment extends ContainerSqlFragment {
    * 
    * @return the match value, not null
    */
-  public String getMatchValue() {
+  String getMatchValue() {
     return _matchValue;
   }
 

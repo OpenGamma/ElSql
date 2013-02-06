@@ -40,7 +40,7 @@ final class LikeSqlFragment extends ContainerSqlFragment {
    * 
    * @return the variable, not null
    */
-  public String getVariable() {
+  String getVariable() {
     return _variable;
   }
 

@@ -42,7 +42,7 @@ final class TextSqlFragment extends SqlFragment {
    * 
    * @return the text, not null
    */
-  public String getText() {
+  String getText() {
     return _text;
   }
 
