@@ -32,6 +32,10 @@ public class ElSqlConfig {
    * of FETCH-OFFSET.
    */
   public static final ElSqlConfig MYSQL = new MySqlElSqlConfig();
+
+  
+  public static final ElSqlConfig ORACLE = new OracleElSqlConfig();
+
   /**
    * A constant for the config needed for SQL Server 2008, which pages in a different way.
    */
@@ -201,6 +205,32 @@ public class ElSqlConfig {
     }
   }
 
+  
+  private static class OracleElSqlConfig extends ElSqlConfig {
+	    public OracleElSqlConfig() {
+	      super("Oracle");
+	    }
+	    @Override
+		public String addPaging(String selectToPage, int offset, int fetchLimit) {
+	      if (fetchLimit == 0 && offset == 0) {
+	        return selectToPage;
+	      }
+	      if (offset == 0 && fetchLimit > 0)
+	      {
+	      return "SELECT * FROM ( " + selectToPage + " ) where rownum <= " + fetchLimit;
+	      
+	      }
+	      int start = offset;
+	      int end = offset + fetchLimit;
+	      
+	      return "SELECT * FROM (SELECT  row_.*,rownum rownum_ FROM ( " + selectToPage + " ) row_ where rownum <= "+ end +")  WHERE rownum_  > " + start;
+	    }
+	    @Override
+	    public String getPaging(int offset, int fetchLimit) {
+	      throw new UnsupportedOperationException();
+	    }
+	  }
+  
   //-------------------------------------------------------------------------
   /**
    * Class for SQL server 2008.
