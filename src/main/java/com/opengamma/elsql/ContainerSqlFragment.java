@@ -51,7 +51,6 @@ class ContainerSqlFragment extends SqlFragment {
   protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource) {
     for (SqlFragment fragment : _fragments) {
       fragment.toSQL(buf, bundle, paramSource);
-      //buf.append("\n");
     }
   }
 
