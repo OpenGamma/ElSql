@@ -136,10 +136,13 @@ public class ElSqlBundleTest {
   public void test_insert_variable() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
-        "  SELECT * FROM @INCLUDE(:var) WHERE TRUE"
+        "  SELECT * FROM @INCLUDE(:var) WHERE TRUE",
+        "  ",
+        "@NAME(Table)",
+        "  foo"
     );
     ElSqlBundle bundle = ElSqlBundle.parse(lines);
-    String sql1 = bundle.getSql("Test1", new MapSqlParameterSource("var", "foo"));
+    String sql1 = bundle.getSql("Test1", new MapSqlParameterSource("var", "Table"));
     assertEquals("SELECT * FROM foo WHERE TRUE ", sql1);
   }
 
