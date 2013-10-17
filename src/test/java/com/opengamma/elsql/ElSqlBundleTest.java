@@ -656,4 +656,16 @@ public class ElSqlBundleTest {
     ElSqlBundle.parse(lines);
   }
 
+  //-------------------------------------------------------------------------
+  public void test_value() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM @VALUE(:var), vax"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    MapSqlParameterSource source = new MapSqlParameterSource("var", "mytable");
+    String sql1 = bundle.getSql("Test1", source);
+    assertEquals("SELECT * FROM mytable, vax ", sql1);
+  }
+
 }

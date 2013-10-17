@@ -60,6 +60,10 @@ final class ElSqlParser {
    */
   private static final Pattern FETCH_ROWS_PATTERN = Pattern.compile("[@]FETCH[(]([0-9]+)[)](.*)");
   /**
+   * The regex for @VALUE(fetchVariable)
+   */
+  private static final Pattern VALUE_PATTERN = Pattern.compile("[@]VALUE[(][:]([A-Za-z0-9_]+)[)](.*)");
+  /**
    * The regex for text :variable text
    */
   private static final Pattern VARIABLE_PATTERN = Pattern.compile("([^:])*([:][A-Za-z0-9_]+)(.*)");
@@ -258,6 +262,9 @@ final class ElSqlParser {
     } else  if (trimmed.contains("@FETCH")) {
       parseFetchTag(container, line);
       
+    } else  if (trimmed.contains("@VALUE")) {
+      parseValueTag(container, line);
+      
     } else if (trimmed.startsWith("@")) {
       throw new IllegalArgumentException("Unknown tag at start of line: " + line);
       
@@ -397,6 +404,33 @@ final class ElSqlParser {
     OffsetFetchSqlFragment pagingFragment = new OffsetFetchSqlFragment(fetchVariable);
     container.addFragment(textFragment);
     container.addFragment(pagingFragment);
+    
+    Line subLine = new Line(remainder, line.lineNumber());
+    parseLine(container, subLine);
+  }
+
+  /**
+   * Parse VALUE tag.
+   * <p>
+   * This tag can appear anywhere in a line.
+   * The text before is treated as simple text.
+   * The text after is parsed.
+   * 
+   * @param container  the container to add to, not null
+   * @param line  the line to parse, not null
+   */
+  private void parseValueTag(ContainerSqlFragment container, Line line) {
+    String trimmed = line.lineTrimmed();
+    int pos = trimmed.indexOf("@VALUE");
+    TextSqlFragment textFragment = new TextSqlFragment(trimmed.substring(0, pos));
+    Matcher matcher = VALUE_PATTERN.matcher(trimmed.substring(pos));
+    if (matcher.matches() == false) {
+      throw new IllegalArgumentException("@VALUE found with invalid format: " + line);
+    }
+    ValueSqlFragment includeFragment = new ValueSqlFragment(matcher.group(1));
+    String remainder = matcher.group(2);
+    container.addFragment(textFragment);
+    container.addFragment(includeFragment);
     
     Line subLine = new Line(remainder, line.lineNumber());
     parseLine(container, subLine);

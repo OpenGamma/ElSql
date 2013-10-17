@@ -8,6 +8,11 @@
   <body>
 
     <!-- types are add, fix, remove, update -->
+    <release version="0.8" date="2013-10-17" description="v0.8">
+      <action dev="jodastephen" type="add">
+        Add @VALUE tag to output a value. Fixes #3.
+      </action>
+    </release>
     <release version="0.7" date="2012-10-12" description="v0.7">
       <action dev="jodastephen" type="add">
         Initial release as separate project from OpenGamma.
