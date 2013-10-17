@@ -447,7 +447,12 @@ final class ElSqlParser {
 
     Line(String line, int lineNumber) {
       _line = line;
-      _trimmed = line.trim();
+      int commentPos = line.indexOf("--");
+      if (commentPos >= 0) {
+        _trimmed = line.substring(0, commentPos).trim();
+      } else {
+        _trimmed = line.trim();
+      }
       _lineNumber = lineNumber;
     }
 

@@ -65,7 +65,7 @@ public class ElSqlBundleTest {
   public void test_name_midComments() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
-        "  SELECT * FROM",
+        "  SELECT * FROM  -- first line",
         "--  foo",
         "  WHERE TRUE",
         "  "

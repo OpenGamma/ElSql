@@ -10,6 +10,10 @@
     <!-- types are add, fix, remove, update -->
     <release version="0.8" date="2013-10-17" description="v0.8">
       <action dev="jodastephen" type="fix">
+        Fix to handle trailing line comments.
+        Fixes #5.
+      </action>
+      <action dev="jodastephen" type="fix">
         Backwards incompatible change to @INCLUDE(:variable).
         Previously, it included the value of the variable.
         Now it includes the named section identified by the variable.

@@ -40,7 +40,7 @@ public class LineTest {
   public void test_comment() {
     Line line = new Line("--", 1);
     assertEquals("--", line.line());
-    assertEquals("--", line.lineTrimmed());
+    assertEquals("", line.lineTrimmed());
     assertEquals(1, line.lineNumber());
     assertEquals(false, line.containsTab());
     assertEquals(true, line.isComment());
@@ -50,10 +50,20 @@ public class LineTest {
   public void test_comment_indent() {
     Line line = new Line("  -- comment", 2);
     assertEquals("  -- comment", line.line());
-    assertEquals("-- comment", line.lineTrimmed());
+    assertEquals("", line.lineTrimmed());
     assertEquals(2, line.lineNumber());
     assertEquals(false, line.containsTab());
     assertEquals(true, line.isComment());
+    assertEquals(2, line.indent());
+  }
+
+  public void test_trailingComment_indent() {
+    Line line = new Line("  SELECT * FROM foo  -- comment", 2);
+    assertEquals("  SELECT * FROM foo  -- comment", line.line());
+    assertEquals("SELECT * FROM foo", line.lineTrimmed());
+    assertEquals(2, line.lineNumber());
+    assertEquals(false, line.containsTab());
+    assertEquals(false, line.isComment());
     assertEquals(2, line.indent());
   }
 
