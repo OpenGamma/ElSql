@@ -9,7 +9,7 @@
   <artifactId>elsql</artifactId>
   <packaging>jar</packaging>
   <name>ElSql</name>
-  <version>0.8</version>
+  <version>0.9-SNAPSHOT</version>
   <description>Simple tool to externalize SQL from Java in partnership with Spring</description>
   <url>https://github.com/OpenGamma/ElSql</url>
 
