@@ -208,6 +208,8 @@ public class ElSqlConfig {
   //-------------------------------------------------------------------------
   /**
    * Class for Oracle RDBMS.
+   * Oracle 12c can use the SQL standard verbose OFFSET/FETCH
+   * http://www.oracle-base.com/articles/12c/row-limiting-clause-for-top-n-queries-12cr1.php
    */
   private static class OracleElSqlConfig extends ElSqlConfig {
     public OracleElSqlConfig() {
