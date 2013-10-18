@@ -269,7 +269,7 @@ final class ElSqlParser {
       throw new IllegalArgumentException("Unknown tag at start of line: " + line);
       
     } else {
-      TextSqlFragment textFragment = new TextSqlFragment(trimmed);
+      TextSqlFragment textFragment = new TextSqlFragment(trimmed, line.endOfLine());
       container.addFragment(textFragment);
     }
   }
@@ -286,19 +286,18 @@ final class ElSqlParser {
    * @param line  the line to parse, not null
    */
   private void parseIncludeTag(ContainerSqlFragment container, Line line) {
-    String trimmed = line.lineTrimmed();
-    int pos = trimmed.indexOf("@INCLUDE");
-    TextSqlFragment textFragment = new TextSqlFragment(trimmed.substring(0, pos));
-    Matcher includeMatcher = INCLUDE_PATTERN.matcher(trimmed.substring(pos));
-    if (includeMatcher.matches() == false) {
+    Line[] split = line.split(line.lineTrimmed().indexOf("@INCLUDE"));
+    parseLine(container, split[0]);
+    String trimmed = split[1].lineTrimmed();
+    
+    Matcher matcher = INCLUDE_PATTERN.matcher(trimmed);
+    if (matcher.matches() == false) {
       throw new IllegalArgumentException("@INCLUDE found with invalid format: " + line);
     }
-    IncludeSqlFragment includeFragment = new IncludeSqlFragment(includeMatcher.group(1));
-    String remainder = includeMatcher.group(2);
-    container.addFragment(textFragment);
+    IncludeSqlFragment includeFragment = new IncludeSqlFragment(matcher.group(1));
     container.addFragment(includeFragment);
     
-    Line subLine = new Line(remainder, line.lineNumber());
+    Line subLine = split[1].split(matcher.start(2))[1];
     parseLine(container, subLine);
   }
 
@@ -313,28 +312,27 @@ final class ElSqlParser {
    * @param line  the line to parse, not null
    */
   private void parseLikeTag(ContainerSqlFragment container, Line line) {
-    String trimmed = line.lineTrimmed();
-    int pos = trimmed.indexOf("@LIKE");
-    TextSqlFragment beforeTextFragment = new TextSqlFragment(trimmed.substring(0, pos));
-    trimmed = trimmed.substring(pos + 5);
-    String content = trimmed;
+    Line[] split = line.split(line.lineTrimmed().indexOf("@LIKE"));
+    parseLine(container, split[0]);
+    String trimmed = split[1].lineTrimmed();
+    
+    String content = trimmed.substring(5);
     int end = trimmed.indexOf("@ENDLIKE");
-    String remainder = "";
+    int remainderIndex = trimmed.length();
     if (end >= 0) {
-      content = trimmed.substring(0, end);
-      remainder = trimmed.substring(end + 8);
+      content = trimmed.substring(5, end);
+      remainderIndex = end + 8;
     }
-    TextSqlFragment contentTextFragment = new TextSqlFragment(content);
+    TextSqlFragment contentTextFragment = new TextSqlFragment(content, line.endOfLine());
     Matcher matcher = VARIABLE_PATTERN.matcher(content);
     if (matcher.matches() == false) {
       throw new IllegalArgumentException("@LIKE found with invalid format: " + line);
     }
     LikeSqlFragment likeFragment = new LikeSqlFragment(matcher.group(2));
-    container.addFragment(beforeTextFragment);
     container.addFragment(likeFragment);
     likeFragment.addFragment(contentTextFragment);
     
-    Line subLine = new Line(remainder, line.lineNumber());
+    Line subLine = split[1].split(remainderIndex)[1];
     parseLine(container, subLine);
   }
 
@@ -349,26 +347,26 @@ final class ElSqlParser {
    * @param line  the line to parse, not null
    */
   private void parseOffsetFetchTag(ContainerSqlFragment container, Line line) {
-    String trimmed = line.lineTrimmed();
-    int pos = trimmed.indexOf("@OFFSETFETCH");
-    TextSqlFragment textFragment = new TextSqlFragment(trimmed.substring(0, pos));
+    Line[] split = line.split(line.lineTrimmed().indexOf("@OFFSETFETCH"));
+    parseLine(container, split[0]);
+    String trimmed = split[1].lineTrimmed();
+    
     String offsetVariable = "paging_offset";
     String fetchVariable = "paging_fetch";
-    String remainder = trimmed.substring(pos + 12);
-    if (trimmed.substring(pos).startsWith("@OFFSETFETCH(")) {
-      Matcher matcher = OFFSET_FETCH_PATTERN.matcher(trimmed.substring(pos));
+    int remainderIndex = 12;
+    if (trimmed.startsWith("@OFFSETFETCH(")) {
+      Matcher matcher = OFFSET_FETCH_PATTERN.matcher(trimmed);
       if (matcher.matches() == false) {
         throw new IllegalArgumentException("@OFFSETFETCH found with invalid format: " + line);
       }
       offsetVariable = matcher.group(1);
       fetchVariable = matcher.group(2);
-      remainder = matcher.group(3);
+      remainderIndex = matcher.start(3);
     }
     OffsetFetchSqlFragment pagingFragment = new OffsetFetchSqlFragment(offsetVariable, fetchVariable);
-    container.addFragment(textFragment);
     container.addFragment(pagingFragment);
     
-    Line subLine = new Line(remainder, line.lineNumber());
+    Line subLine = split[1].split(remainderIndex)[1];
     parseLine(container, subLine);
   }
 
@@ -383,29 +381,29 @@ final class ElSqlParser {
    * @param line  the line to parse, not null
    */
   private void parseFetchTag(ContainerSqlFragment container, Line line) {
-    String trimmed = line.lineTrimmed();
-    int pos = trimmed.indexOf("@FETCH");
-    TextSqlFragment textFragment = new TextSqlFragment(trimmed.substring(0, pos));
+    Line[] split = line.split(line.lineTrimmed().indexOf("@FETCH"));
+    parseLine(container, split[0]);
+    String trimmed = split[1].lineTrimmed();
+    
     String fetchVariable = "paging_fetch";
-    String remainder = trimmed.substring(pos + 6);
-    if (trimmed.substring(pos).startsWith("@FETCH(")) {
-      Matcher matcher = FETCH_PATTERN.matcher(trimmed.substring(pos));
-      Matcher matcherRows = FETCH_ROWS_PATTERN.matcher(trimmed.substring(pos));
-      if (matcher.matches()) {
-        fetchVariable = matcher.group(1);
-        remainder = matcher.group(2);
+    int remainderIndex = 6;
+    if (trimmed.startsWith("@FETCH(")) {
+      Matcher matcherVariable = FETCH_PATTERN.matcher(trimmed);
+      Matcher matcherRows = FETCH_ROWS_PATTERN.matcher(trimmed);
+      if (matcherVariable.matches()) {
+        fetchVariable = matcherVariable.group(1);
+        remainderIndex = matcherVariable.start(2);
       } else if (matcherRows.matches()) {
         fetchVariable = matcherRows.group(1);
-        remainder = matcherRows.group(2);
+        remainderIndex = matcherRows.start(2);
       } else {
         throw new IllegalArgumentException("@FETCH found with invalid format: " + line);
       }
     }
     OffsetFetchSqlFragment pagingFragment = new OffsetFetchSqlFragment(fetchVariable);
-    container.addFragment(textFragment);
     container.addFragment(pagingFragment);
     
-    Line subLine = new Line(remainder, line.lineNumber());
+    Line subLine = split[1].split(remainderIndex)[1];
     parseLine(container, subLine);
   }
 
@@ -420,19 +418,18 @@ final class ElSqlParser {
    * @param line  the line to parse, not null
    */
   private void parseValueTag(ContainerSqlFragment container, Line line) {
-    String trimmed = line.lineTrimmed();
-    int pos = trimmed.indexOf("@VALUE");
-    TextSqlFragment textFragment = new TextSqlFragment(trimmed.substring(0, pos));
-    Matcher matcher = VALUE_PATTERN.matcher(trimmed.substring(pos));
+    Line[] split = line.split(line.lineTrimmed().indexOf("@VALUE"));
+    parseLine(container, split[0]);
+    String trimmed = split[1].lineTrimmed();
+    
+    Matcher matcher = VALUE_PATTERN.matcher(trimmed);
     if (matcher.matches() == false) {
       throw new IllegalArgumentException("@VALUE found with invalid format: " + line);
     }
-    ValueSqlFragment includeFragment = new ValueSqlFragment(matcher.group(1));
-    String remainder = matcher.group(2);
-    container.addFragment(textFragment);
-    container.addFragment(includeFragment);
+    ValueSqlFragment valueFragment = new ValueSqlFragment(matcher.group(1));
+    container.addFragment(valueFragment);
     
-    Line subLine = new Line(remainder, line.lineNumber());
+    Line subLine = split[1].split(matcher.start(2))[1];
     parseLine(container, subLine);
   }
 
@@ -444,6 +441,7 @@ final class ElSqlParser {
     private final String _line;
     private final String _trimmed;
     private final int _lineNumber;
+    private final boolean _endOfLine;
 
     Line(String line, int lineNumber) {
       _line = line;
@@ -454,6 +452,14 @@ final class ElSqlParser {
         _trimmed = line.trim();
       }
       _lineNumber = lineNumber;
+      _endOfLine = true;
+    }
+
+    Line(String line, String trimmed, int lineNumber, boolean endOfLine) {
+      _line = line;
+      _trimmed = trimmed;
+      _lineNumber = lineNumber;
+      _endOfLine = endOfLine;
     }
 
     String line() {
@@ -466,6 +472,10 @@ final class ElSqlParser {
 
     int lineNumber() {
       return _lineNumber;
+    }
+
+    boolean endOfLine() {
+      return _endOfLine;
     }
 
     boolean containsTab() {
@@ -483,6 +493,12 @@ final class ElSqlParser {
         }
       }
       return _line.length();
+    }
+
+    Line[] split(int trimmedIndex) {
+      String before = _trimmed.substring(0, trimmedIndex);
+      String after = _trimmed.substring(trimmedIndex);
+      return new Line[] {new Line(before, before, _lineNumber, false), new Line(after, after, _lineNumber, _endOfLine)};
     }
 
     @Override

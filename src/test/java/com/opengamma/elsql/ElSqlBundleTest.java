@@ -671,4 +671,29 @@ public class ElSqlBundleTest {
     assertEquals("SELECT * FROM mytable, vax ", sql1);
   }
 
+  public void test_valueLike() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT DISTINCT doc_id FROM main",
+        "  WHERE main.id = :doc.id",
+        "  AND doc.id IN ( SELECT id FROM @VALUE(:table_prefix)_idkey WHERE key_scheme @LIKE :scheme @ENDLIKE )"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    MapSqlParameterSource source = new MapSqlParameterSource("table_prefix", "mytable").addValue("scheme", "myscheme");
+    String sql1 = bundle.getSql("Test1", source);
+    assertEquals("SELECT DISTINCT doc_id FROM main WHERE main.id = :doc.id " +
+        "AND doc.id IN ( SELECT id FROM mytable_idkey WHERE key_scheme = :scheme ) ", sql1);
+  }
+
+  public void test_valueFetch() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  AA @VALUE(:var) @FETCH"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    MapSqlParameterSource source = new MapSqlParameterSource("var", "mytable").addValue("paging_fetch", 10);
+    String sql1 = bundle.getSql("Test1", source);
+    assertEquals("AA mytable FETCH FIRST 10 ROWS ONLY ", sql1);
+  }
+
 }

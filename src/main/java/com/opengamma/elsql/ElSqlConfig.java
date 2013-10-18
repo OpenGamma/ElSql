@@ -123,7 +123,7 @@ public class ElSqlConfig {
    * @return the updated SELECT, not null
    */
   public String addPaging(String selectToPage, int offset, int fetchLimit) {
-    return selectToPage + getPaging(offset, fetchLimit);
+    return selectToPage + (selectToPage.endsWith(" ") ? "" : " ") + getPaging(offset, fetchLimit);
   }
 
   /**

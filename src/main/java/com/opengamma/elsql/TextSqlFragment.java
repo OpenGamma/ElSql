@@ -24,15 +24,19 @@ final class TextSqlFragment extends SqlFragment {
    * 
    * @param text  the text of the fragment, not null
    */
-  TextSqlFragment(String text) {
+  TextSqlFragment(String text, boolean endOfLine) {
     if (text == null) {
       throw new IllegalArgumentException("Text must be specified");
     }
-    text = text.trim();
-    if (text.length() == 0) {
-      _text = "";
+    if (endOfLine) {
+      text = text.trim();
+      if (text.length() == 0) {
+        _text = "";
+      } else {
+        _text = text + " ";
+      }
     } else {
-      _text = text + " ";
+      _text = text;
     }
   }
 

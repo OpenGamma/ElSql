@@ -8,6 +8,12 @@
   <body>
 
     <!-- types are add, fix, remove, update -->
+    <release version="0.8.1" date="2013-10-18" description="v0.8.1">
+      <action dev="jodastephen" type="fix">
+        Fix to handle two tags on same line.
+        Fixes #6.
+      </action>
+    </release>
     <release version="0.8" date="2013-10-17" description="v0.8">
       <action dev="jodastephen" type="fix">
         Fix to handle trailing line comments.
