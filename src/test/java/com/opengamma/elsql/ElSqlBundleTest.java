@@ -696,4 +696,51 @@ public class ElSqlBundleTest {
     assertEquals("AA mytable FETCH FIRST 10 ROWS ONLY ", sql1);
   }
 
+  //-------------------------------------------------------------------------
+  public void test_loopWithJoin() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo WHERE",
+        "  @LOOP(:size)",
+        "    (a = :a@LOOPINDEX AND b = :b@LOOPINDEX)",
+        "    @LOOPJOIN OR"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    MapSqlParameterSource source = new MapSqlParameterSource("size", 2)
+      .addValue("a0", "name").addValue("b0", "bob")
+      .addValue("b0", "type").addValue("b1", "doctor");
+    String sql1 = bundle.getSql("Test1", source);
+    assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = :b0) OR (a = :a1 AND b = :b1) ", sql1);
+  }
+
+  public void test_loopWithJoin_sizeString() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo WHERE",
+        "  @LOOP(:size)",
+        "    (a = :a@LOOPINDEX AND b = :b@LOOPINDEX)",
+        "    @LOOPJOIN OR"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    MapSqlParameterSource source = new MapSqlParameterSource("size", "1")
+      .addValue("a0", "name").addValue("b0", "bob");
+    String sql1 = bundle.getSql("Test1", source);
+    assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = :b0) ", sql1);
+  }
+
+  public void test_loopWithJoin_sizeZeroWithWhereTag() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  @WHERE",
+        "    @LOOP(:size)",
+        "      (a = :a@LOOPINDEX AND b = :b@LOOPINDEX)",
+        "      @LOOPJOIN OR"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    MapSqlParameterSource source = new MapSqlParameterSource("size", 0);
+    String sql1 = bundle.getSql("Test1", source);
+    assertEquals("SELECT * FROM foo ", sql1);
+  }
+
 }

@@ -40,6 +40,10 @@ final class ElSqlParser {
    */
   private static final Pattern IF_PATTERN = Pattern.compile("[ ]*[@]IF[(]([:][A-Za-z0-9_]+)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
   /**
+   * The regex for @LOOP(variable)
+   */
+  private static final Pattern LOOP_PATTERN = Pattern.compile("[ ]*[@]LOOP[(][:]([A-Za-z0-9_]+)[)][ ]*");
+  /**
    * The regex for @INCLUDE(key)
    */
   private static final Pattern INCLUDE_PATTERN = Pattern.compile("[@]INCLUDE[(]([:]?[A-Za-z0-9_]+)[)](.*)");
@@ -60,7 +64,7 @@ final class ElSqlParser {
    */
   private static final Pattern FETCH_ROWS_PATTERN = Pattern.compile("[@]FETCH[(]([0-9]+)[)](.*)");
   /**
-   * The regex for @VALUE(fetchVariable)
+   * The regex for @VALUE(variable)
    */
   private static final Pattern VALUE_PATTERN = Pattern.compile("[@]VALUE[(][:]([A-Za-z0-9_]+)[)](.*)");
   /**
@@ -216,6 +220,22 @@ final class ElSqlParser {
         }
         container.addFragment(ifFragment);
         
+      } else if (trimmed.startsWith("@LOOP")) {
+        if (trimmed.startsWith("@LOOPINDEX") || trimmed.startsWith("@LOOPJOIN")) {
+          parseLine(container, line);
+        } else {
+          Matcher loopMatcher = LOOP_PATTERN.matcher(trimmed);
+          if (loopMatcher.matches() == false) {
+            throw new IllegalArgumentException("@LOOP found with invalid format: " + line);
+          }
+          LoopSqlFragment loopFragment = new LoopSqlFragment(loopMatcher.group(1));
+          parseContainerSection(loopFragment, lineIterator, line.indent());
+          if (loopFragment.getFragments().size() == 0) {
+            throw new IllegalArgumentException("@LOOP found with no subsequent indented lines: " + line);
+          }
+          container.addFragment(loopFragment);
+        }
+        
       } else {
         parseLine(container, line);
       }
@@ -264,6 +284,10 @@ final class ElSqlParser {
       
     } else  if (trimmed.contains("@VALUE")) {
       parseValueTag(container, line);
+      
+    } else  if (trimmed.contains("@LOOPJOIN")) {
+      TextSqlFragment textFragment = new TextSqlFragment(trimmed, line.endOfLine());
+      container.addFragment(textFragment);
       
     } else if (trimmed.startsWith("@")) {
       throw new IllegalArgumentException("Unknown tag at start of line: " + line);

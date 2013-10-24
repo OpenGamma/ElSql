@@ -8,6 +8,12 @@
   <body>
 
     <!-- types are add, fix, remove, update -->
+    <release version="0.9" date="2013-10-24" description="v0.9">
+      <action dev="jodastephen" type="add">
+        Provide simple looping support in ElSql file.
+        Fixes #7.
+      </action>
+    </release>
     <release version="0.8.1" date="2013-10-18" description="v0.8.1">
       <action dev="jodastephen" type="fix">
         Fix to handle two tags on same line.
