@@ -27,12 +27,12 @@ final class OrSqlFragment extends ConditionalSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource) {
-    if (isMatch(paramSource)) {
+  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
+    if (isMatch(paramSource, loopIndex)) {
       if (endsWith(buf, " WHERE ") == false && endsWith(buf, " OR ") == false) {
         buf.append("OR ");
       }
-      super.toSQL(buf, bundle, paramSource);
+      super.toSQL(buf, bundle, paramSource, loopIndex);
     }
   }
 

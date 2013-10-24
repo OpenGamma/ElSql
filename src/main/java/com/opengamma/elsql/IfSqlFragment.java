@@ -26,9 +26,9 @@ final class IfSqlFragment extends ConditionalSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource) {
-    if (isMatch(paramSource)) {
-      super.toSQL(buf, bundle, paramSource);
+  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
+    if (isMatch(paramSource, loopIndex)) {
+      super.toSQL(buf, bundle, paramSource, loopIndex);
     }
   }
 

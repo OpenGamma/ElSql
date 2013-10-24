@@ -43,13 +43,13 @@ final class IncludeSqlFragment extends SqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource) {
+  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
     String key = _includeKey;
     if (key.startsWith(":")) {
       key = paramSource.getValue(_includeKey.substring(1)).toString();
     }
     NameSqlFragment unit = bundle.getFragment(key);
-    unit.toSQL(buf, bundle, paramSource);
+    unit.toSQL(buf, bundle, paramSource, loopIndex);
   }
 
   //-------------------------------------------------------------------------

@@ -30,15 +30,15 @@ final class ElSqlParser {
   /**
    * The regex for @AND(identifier).
    */
-  private static final Pattern AND_PATTERN = Pattern.compile("[ ]*[@]AND[(]([:][A-Za-z0-9_]+)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
+  private static final Pattern AND_PATTERN = Pattern.compile("[ ]*[@]AND[(]([:][A-Za-z0-9_]+(?:@LOOPINDEX)?)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
   /**
    * The regex for @OR(identifier).
    */
-  private static final Pattern OR_PATTERN = Pattern.compile("[ ]*[@]OR[(]([:][A-Za-z0-9_]+)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
+  private static final Pattern OR_PATTERN = Pattern.compile("[ ]*[@]OR[(]([:][A-Za-z0-9_]+(?:@LOOPINDEX)?)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
   /**
    * The regex for @IF(identifier).
    */
-  private static final Pattern IF_PATTERN = Pattern.compile("[ ]*[@]IF[(]([:][A-Za-z0-9_]+)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
+  private static final Pattern IF_PATTERN = Pattern.compile("[ ]*[@]IF[(]([:][A-Za-z0-9_]+(?:@LOOPINDEX)?)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
   /**
    * The regex for @LOOP(variable)
    */
@@ -66,11 +66,11 @@ final class ElSqlParser {
   /**
    * The regex for @VALUE(variable)
    */
-  private static final Pattern VALUE_PATTERN = Pattern.compile("[@]VALUE[(][:]([A-Za-z0-9_]+)[)](.*)");
+  private static final Pattern VALUE_PATTERN = Pattern.compile("[@]VALUE[(][:]([A-Za-z0-9_]+(?:@LOOPINDEX)?)[)](.*)");
   /**
    * The regex for text :variable text
    */
-  private static final Pattern VARIABLE_PATTERN = Pattern.compile("([^:])*([:][A-Za-z0-9_]+)(.*)");
+  private static final Pattern LIKE_VARIABLE_PATTERN = Pattern.compile("([^:])*([:][A-Za-z0-9_]+(?:@LOOPINDEX)?)(.*)");
 
   /**
    * The input.
@@ -348,7 +348,7 @@ final class ElSqlParser {
       remainderIndex = end + 8;
     }
     TextSqlFragment contentTextFragment = new TextSqlFragment(content, line.endOfLine());
-    Matcher matcher = VARIABLE_PATTERN.matcher(content);
+    Matcher matcher = LIKE_VARIABLE_PATTERN.matcher(content);
     if (matcher.matches() == false) {
       throw new IllegalArgumentException("@LIKE found with invalid format: " + line);
     }

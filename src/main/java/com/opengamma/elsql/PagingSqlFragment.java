@@ -34,9 +34,9 @@ final class PagingSqlFragment extends ContainerSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource) {
+  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
     int oldLen = buf.length();
-    super.toSQL(buf, bundle, paramSource);
+    super.toSQL(buf, bundle, paramSource, loopIndex);
     int newLen = buf.length();
     String select = buf.substring(oldLen, newLen);
     if (select.startsWith("SELECT ")) {

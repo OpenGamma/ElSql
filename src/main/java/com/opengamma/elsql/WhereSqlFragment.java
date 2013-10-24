@@ -22,11 +22,11 @@ final class WhereSqlFragment extends ContainerSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource) {
+  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
     int oldLen = buf.length();
     buf.append("WHERE ");
     int newLen = buf.length();
-    super.toSQL(buf, bundle, paramSource);
+    super.toSQL(buf, bundle, paramSource, loopIndex);
     if (buf.length() == newLen) {
       buf.setLength(oldLen);
     }

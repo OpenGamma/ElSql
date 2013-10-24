@@ -697,6 +697,21 @@ public class ElSqlBundleTest {
   }
 
   //-------------------------------------------------------------------------
+  public void test_loopNoJoin() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo WHERE",
+        "  @LOOP(:size)",
+        "    (a = :a@LOOPINDEX AND b = :b@LOOPINDEX)"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    MapSqlParameterSource source = new MapSqlParameterSource("size", 2)
+      .addValue("a0", "name").addValue("b0", "bob")
+      .addValue("b0", "type").addValue("b1", "doctor");
+    String sql1 = bundle.getSql("Test1", source);
+    assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = :b0) (a = :a1 AND b = :b1) ", sql1);
+  }
+
   public void test_loopWithJoin() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -741,6 +756,54 @@ public class ElSqlBundleTest {
     MapSqlParameterSource source = new MapSqlParameterSource("size", 0);
     String sql1 = bundle.getSql("Test1", source);
     assertEquals("SELECT * FROM foo ", sql1);
+  }
+
+  public void test_loopWithJoin_like() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo WHERE",
+        "  @LOOP(:size)",
+        "    (a = :a@LOOPINDEX AND b @LIKE :b@LOOPINDEX@ENDLIKE)",
+        "    @LOOPJOIN OR"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    MapSqlParameterSource source = new MapSqlParameterSource("size", 2)
+      .addValue("a0", "name").addValue("b0", "bob")
+      .addValue("b0", "type").addValue("b1", "doctor");
+    String sql1 = bundle.getSql("Test1", source);
+    assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = :b0 ) OR (a = :a1 AND b = :b1 ) ", sql1);
+  }
+
+  public void test_loopWithJoin_likeSpace() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo WHERE",
+        "  @LOOP(:size)",
+        "    (a = :a@LOOPINDEX AND b @LIKE :b@LOOPINDEX @ENDLIKE)",
+        "    @LOOPJOIN OR"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    MapSqlParameterSource source = new MapSqlParameterSource("size", 2)
+      .addValue("a0", "name").addValue("b0", "bob")
+      .addValue("b0", "type").addValue("b1", "doctor");
+    String sql1 = bundle.getSql("Test1", source);
+    assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = :b0 ) OR (a = :a1 AND b = :b1 ) ", sql1);
+  }
+
+  public void test_loopWithJoin_value() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo WHERE",
+        "  @LOOP(:size)",
+        "    (a = :a@LOOPINDEX AND b = @VALUE(:b@LOOPINDEX))",
+        "    @LOOPJOIN OR"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    MapSqlParameterSource source = new MapSqlParameterSource("size", 2)
+      .addValue("a0", "name").addValue("b0", "bob")
+      .addValue("a1", "type").addValue("b1", "doctor");
+    String sql1 = bundle.getSql("Test1", source);
+    assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = bob) OR (a = :a1 AND b = doctor) ", sql1);
   }
 
 }

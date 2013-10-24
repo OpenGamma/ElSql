@@ -46,7 +46,7 @@ final class OffsetFetchSqlFragment extends ContainerSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource) {
+  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
     int offset = 0;
     int fetchLimit = 0;
     if (_offsetVariable != null && paramSource.hasValue(_offsetVariable)) {

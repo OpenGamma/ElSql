@@ -215,7 +215,7 @@ public final class ElSqlBundle {
   public String getSql(String name, SqlParameterSource paramSource) {
     NameSqlFragment fragment = getFragment(name);
     StringBuilder buf = new StringBuilder(1024);
-    fragment.toSQL(buf, this, paramSource);
+    fragment.toSQL(buf, this, paramSource, -1);
     return buf.toString();
   }
 

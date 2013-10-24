@@ -32,19 +32,10 @@ final class ValueSqlFragment extends SqlFragment {
   }
 
   //-------------------------------------------------------------------------
-  /**
-   * Gets the variable.
-   * 
-   * @return the variable, not null
-   */
-  String getVariable() {
-    return _valueVariable;
-  }
-
-  //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource) {
-    Object value = paramSource.getValue(_valueVariable);
+  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
+    String var = applyLoopIndex(_valueVariable, loopIndex);
+    Object value = paramSource.getValue(var);
     buf.append(value);
   }
 

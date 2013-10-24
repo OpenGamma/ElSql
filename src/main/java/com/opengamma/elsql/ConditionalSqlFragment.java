@@ -58,11 +58,12 @@ abstract class ConditionalSqlFragment extends ContainerSqlFragment {
   }
 
   //-------------------------------------------------------------------------
-  protected boolean isMatch(SqlParameterSource paramSource) {
-    if (paramSource.hasValue(_variable) == false) {
+  protected boolean isMatch(SqlParameterSource paramSource, int loopIndex) {
+    String var = applyLoopIndex(_variable, loopIndex);
+    if (paramSource.hasValue(var) == false) {
       return false;
     }
-    Object value = paramSource.getValue(_variable);
+    Object value = paramSource.getValue(var);
     if (_matchValue != null) {
       return _matchValue.equalsIgnoreCase(value.toString());
     }

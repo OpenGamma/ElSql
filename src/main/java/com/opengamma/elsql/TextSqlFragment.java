@@ -41,19 +41,10 @@ final class TextSqlFragment extends SqlFragment {
   }
 
   //-------------------------------------------------------------------------
-  /**
-   * Gets the text.
-   * 
-   * @return the text, not null
-   */
-  String getText() {
-    return _text;
-  }
-
-  //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource) {
-    buf.append(_text);
+  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
+    String text = applyLoopIndex(_text, loopIndex);
+    buf.append(text);
   }
 
   //-------------------------------------------------------------------------
