@@ -26,51 +26,51 @@ final class ElSqlParser {
   /**
    * The regex for @NAME(identifier).
    */
-  private static final Pattern NAME_PATTERN = Pattern.compile("[ ]*[@]NAME[(]([A-Za-z0-9_]+)[)][ ]*");
+  private static final Pattern NAME_PATTERN = Pattern.compile("[ ]*[@]NAME[(]([A-Za-z0-9_.]+)[)][ ]*");
   /**
    * The regex for @AND(identifier).
    */
-  private static final Pattern AND_PATTERN = Pattern.compile("[ ]*[@]AND[(]([:][A-Za-z0-9_]+(?:@LOOPINDEX)?)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
+  private static final Pattern AND_PATTERN = Pattern.compile("[ ]*[@]AND[(]([:][A-Za-z0-9_.]+(?:@LOOPINDEX)?)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
   /**
    * The regex for @OR(identifier).
    */
-  private static final Pattern OR_PATTERN = Pattern.compile("[ ]*[@]OR[(]([:][A-Za-z0-9_]+(?:@LOOPINDEX)?)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
+  private static final Pattern OR_PATTERN = Pattern.compile("[ ]*[@]OR[(]([:][A-Za-z0-9_.]+(?:@LOOPINDEX)?)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
   /**
    * The regex for @IF(identifier).
    */
-  private static final Pattern IF_PATTERN = Pattern.compile("[ ]*[@]IF[(]([:][A-Za-z0-9_]+(?:@LOOPINDEX)?)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
+  private static final Pattern IF_PATTERN = Pattern.compile("[ ]*[@]IF[(]([:][A-Za-z0-9_.]+(?:@LOOPINDEX)?)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
   /**
    * The regex for @LOOP(variable)
    */
-  private static final Pattern LOOP_PATTERN = Pattern.compile("[ ]*[@]LOOP[(][:]([A-Za-z0-9_]+)[)][ ]*");
+  private static final Pattern LOOP_PATTERN = Pattern.compile("[ ]*[@]LOOP[(][:]([A-Za-z0-9_.]+)[)][ ]*");
   /**
    * The regex for @INCLUDE(key)
    */
-  private static final Pattern INCLUDE_PATTERN = Pattern.compile("[@]INCLUDE[(]([:]?[A-Za-z0-9_]+)[)](.*)");
+  private static final Pattern INCLUDE_PATTERN = Pattern.compile("[@]INCLUDE[(]([:]?[A-Za-z0-9_.]+)[)](.*)");
   /**
    * The regex for @PAGING(offsetVariable,fetchVariable)
    */
-  private static final Pattern PAGING_PATTERN = Pattern.compile("[@]PAGING[(][:]([A-Za-z0-9_]+)[ ]?[,][ ]?[:]([A-Za-z0-9_]+)[)](.*)");
+  private static final Pattern PAGING_PATTERN = Pattern.compile("[@]PAGING[(][:]([A-Za-z0-9_.]+)[ ]?[,][ ]?[:]([A-Za-z0-9_]+)[)](.*)");
   /**
    * The regex for @OFFSETFETCH(offsetVariable,fetchVariable)
    */
-  private static final Pattern OFFSET_FETCH_PATTERN = Pattern.compile("[@]OFFSETFETCH[(][:]([A-Za-z0-9_]+)[ ]?[,][ ]?[:]([A-Za-z0-9_]+)[)](.*)");
+  private static final Pattern OFFSET_FETCH_PATTERN = Pattern.compile("[@]OFFSETFETCH[(][:]([A-Za-z0-9_.]+)[ ]?[,][ ]?[:]([A-Za-z0-9_]+)[)](.*)");
   /**
    * The regex for @FETCH(fetchVariable)
    */
-  private static final Pattern FETCH_PATTERN = Pattern.compile("[@]FETCH[(][:]([A-Za-z0-9_]+)[)](.*)");
+  private static final Pattern FETCH_PATTERN = Pattern.compile("[@]FETCH[(][:]([A-Za-z0-9_.]+)[)](.*)");
   /**
    * The regex for @FETCH(numberRows)
    */
-  private static final Pattern FETCH_ROWS_PATTERN = Pattern.compile("[@]FETCH[(]([0-9]+)[)](.*)");
+  private static final Pattern FETCH_ROWS_PATTERN = Pattern.compile("[@]FETCH[(]([0-9.]+)[)](.*)");
   /**
    * The regex for @VALUE(variable)
    */
-  private static final Pattern VALUE_PATTERN = Pattern.compile("[@]VALUE[(][:]([A-Za-z0-9_]+(?:@LOOPINDEX)?)[)](.*)");
+  private static final Pattern VALUE_PATTERN = Pattern.compile("[@]VALUE[(][:]([A-Za-z0-9_.]+(?:@LOOPINDEX)?)[)](.*)");
   /**
    * The regex for text :variable text
    */
-  private static final Pattern LIKE_VARIABLE_PATTERN = Pattern.compile("([^:])*([:][A-Za-z0-9_]+(?:@LOOPINDEX)?)(.*)");
+  private static final Pattern LIKE_VARIABLE_PATTERN = Pattern.compile("([^:])*([:][A-Za-z0-9_.]+(?:@LOOPINDEX)?)(.*)");
 
   /**
    * The input.
