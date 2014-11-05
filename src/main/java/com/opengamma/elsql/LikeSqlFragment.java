@@ -39,14 +39,18 @@ final class LikeSqlFragment extends ContainerSqlFragment {
   protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
     String var = applyLoopIndex(_variable, loopIndex);
     Object val = paramSource.getValue(var);
-    String value = (val == null ? "" : val.toString());
-    if (bundle.getConfig().isLikeWildcard(value)) {
-      buf.append("LIKE ");
-      super.toSQL(buf, bundle, paramSource, loopIndex);
-      buf.append(bundle.getConfig().getLikeSuffix());
+    if (val == null) {
+      buf.append("IS NULL ");
     } else {
-      buf.append("= ");
-      super.toSQL(buf, bundle, paramSource, loopIndex);
+      String value = (val == null ? "" : val.toString());
+      if (bundle.getConfig().isLikeWildcard(value)) {
+        buf.append("LIKE ");
+        super.toSQL(buf, bundle, paramSource, loopIndex);
+        buf.append(bundle.getConfig().getLikeSuffix());
+      } else {
+        buf.append("= ");
+        super.toSQL(buf, bundle, paramSource, loopIndex);
+      }
     }
   }
 

@@ -68,9 +68,13 @@ final class ElSqlParser {
    */
   private static final Pattern VALUE_PATTERN = Pattern.compile("[@]VALUE[(][:]([A-Za-z0-9_]+(?:@LOOPINDEX)?)[)](.*)");
   /**
-   * The regex for text :variable text
+   * The regex for @LIKE :variable
    */
   private static final Pattern LIKE_VARIABLE_PATTERN = Pattern.compile("([^:])*([:][A-Za-z0-9_]+(?:@LOOPINDEX)?)(.*)");
+  /**
+   * The regex for @EQUALS :variable
+   */
+  private static final Pattern EQUALS_VARIABLE_PATTERN = Pattern.compile("([^:])*([:][A-Za-z0-9_]+(?:@LOOPINDEX)?)(.*)");
 
   /**
    * The input.
@@ -276,6 +280,9 @@ final class ElSqlParser {
     } else  if (trimmed.contains("@LIKE")) {
       parseLikeTag(container, line);
       
+    } else  if (trimmed.contains("@EQUALS")) {
+        parseEqualsTag(container, line);
+        
     } else  if (trimmed.contains("@OFFSETFETCH")) {
       parseOffsetFetchTag(container, line);
       
@@ -359,6 +366,41 @@ final class ElSqlParser {
     Line subLine = split[1].split(remainderIndex)[1];
     parseLine(container, subLine);
   }
+  
+  /**
+   * Parse EQUALS/ENDEQUALS tag.
+   * <p>
+   * This tag can appear anywhere in a line.
+   * The text before is treated as simple text.
+   * The text after is parsed.
+   * 
+   * @param container  the container to add to, not null
+   * @param line  the line to parse, not null
+   */
+  private void parseEqualsTag(ContainerSqlFragment container, Line line) {
+    Line[] split = line.split(line.lineTrimmed().indexOf("@EQUALS"));
+    parseLine(container, split[0]);
+    String trimmed = split[1].lineTrimmed();
+    
+    String content = trimmed.substring(7);
+    int end = trimmed.indexOf("@ENDEQUALS");
+    int remainderIndex = trimmed.length();
+    if (end >= 0) {
+      content = trimmed.substring(7, end);
+      remainderIndex = end + 10;
+    }
+    TextSqlFragment contentTextFragment = new TextSqlFragment(content, line.endOfLine());
+    Matcher matcher = EQUALS_VARIABLE_PATTERN.matcher(content);
+    if (matcher.matches() == false) {
+      throw new IllegalArgumentException("@EQUALS found with invalid format: " + line);
+    }
+    EqualsSqlFragment equalsFragment = new EqualsSqlFragment(matcher.group(2));
+    container.addFragment(equalsFragment);
+    equalsFragment.addFragment(contentTextFragment);
+    
+    Line subLine = split[1].split(remainderIndex)[1];
+    parseLine(container, subLine);
+  }  
 
   /**
    * Parse OFFSET/FETCH tag.
