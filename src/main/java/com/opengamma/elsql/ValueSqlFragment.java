@@ -36,7 +36,9 @@ final class ValueSqlFragment extends SqlFragment {
   protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
     String var = applyLoopIndex(_valueVariable, loopIndex);
     Object value = paramSource.getValue(var);
-    buf.append(value);
+    if (value != null) {
+      buf.append(value);
+    }
   }
 
   //-------------------------------------------------------------------------

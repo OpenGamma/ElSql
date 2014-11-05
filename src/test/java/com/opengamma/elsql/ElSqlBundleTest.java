@@ -349,6 +349,18 @@ public class ElSqlBundleTest {
     assertEquals("SELECT * FROM foo WHERE var = :var ", sql1);
   }
 
+  public void test_if_varPresentNull() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  @IF(:var)",
+        "    WHERE var = :var"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    String sql1 = bundle.getSql("Test1", new MapSqlParameterSource("var", null));
+    assertEquals("SELECT * FROM foo ", sql1);
+  }
+
   public void test_if_varPresentBooleanFalse() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -419,6 +431,42 @@ public class ElSqlBundleTest {
     ElSqlBundle bundle = ElSqlBundle.parse(lines);
     String sql1 = bundle.getSql("Test1", new MapSqlParameterSource("var", Boolean.TRUE));
     assertEquals("SELECT * FROM foo WHERE var = :var ", sql1);
+  }
+
+  public void test_if_withMatch_varPresentMatch() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  @IF(:var = Hello)",
+        "    WHERE var = :var"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    String sql1 = bundle.getSql("Test1", new MapSqlParameterSource("var", "Hello"));
+    assertEquals("SELECT * FROM foo WHERE var = :var ", sql1);
+  }
+
+  public void test_if_withMatch_varPresentNoMatch() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  @IF(:var = Hello)",
+        "    WHERE var = :var"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    String sql1 = bundle.getSql("Test1", new MapSqlParameterSource("var", "NoMatch"));
+    assertEquals("SELECT * FROM foo ", sql1);
+  }
+
+  public void test_if_withMatch_varPresentMatchNull() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  @IF(:var = Hello)",
+        "    WHERE var = :var"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    String sql1 = bundle.getSql("Test1", new MapSqlParameterSource("var", null));
+    assertEquals("SELECT * FROM foo ", sql1);
   }
 
   //-------------------------------------------------------------------------
@@ -530,6 +578,19 @@ public class ElSqlBundleTest {
     );
     ElSqlBundle bundle = ElSqlBundle.parse(lines);
     String sql1 = bundle.getSql("Test1", new MapSqlParameterSource("var", "NoPoint"));
+    assertEquals("SELECT * FROM foo ", sql1);
+  }
+
+  public void test_and_withMatch_varPresentNull() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  @WHERE",
+        "    @AND(:var = Point)",
+        "      var = :var"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    String sql1 = bundle.getSql("Test1", new MapSqlParameterSource("var", null));
     assertEquals("SELECT * FROM foo ", sql1);
   }
 
@@ -669,6 +730,17 @@ public class ElSqlBundleTest {
     MapSqlParameterSource source = new MapSqlParameterSource("var", "mytable");
     String sql1 = bundle.getSql("Test1", source);
     assertEquals("SELECT * FROM mytable, vax ", sql1);
+  }
+
+  public void test_value_null() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM base @VALUE(:additionaltables)"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    MapSqlParameterSource source = new MapSqlParameterSource("additionaltables", null);
+    String sql1 = bundle.getSql("Test1", source);
+    assertEquals("SELECT * FROM base ", sql1);
   }
 
   public void test_valueLike() {

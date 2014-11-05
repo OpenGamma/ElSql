@@ -64,6 +64,9 @@ abstract class ConditionalSqlFragment extends ContainerSqlFragment {
       return false;
     }
     Object value = paramSource.getValue(var);
+    if (value == null) {
+      return false;
+    }
     if (_matchValue != null) {
       return _matchValue.equalsIgnoreCase(value.toString());
     }

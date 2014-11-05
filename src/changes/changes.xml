@@ -8,6 +8,12 @@
   <body>
 
     <!-- types are add, fix, remove, update -->
+    <release version="1.0" date="" description="v1.0">
+      <action dev="jodastephen" type="fix">
+        Support null values in `SqlParameterSource` map within conditional and value tags.
+        Fixes #8.
+      </action>
+    </release>
     <release version="0.9" date="2013-10-24" description="v0.9">
       <action dev="jodastephen" type="add">
         Provide simple looping support in ElSql file.
