@@ -6,6 +6,8 @@ ElSql. Short for "External SQL".
 Pronounced "else-Q-L" where the letters are pronounced quicker than the "else".
 
 Available in [Maven Cental](http://search.maven.org/#search|ga|1|a%3A%22elsql%22).
+Read the [user guide](https://github.com/OpenGamma/ElSql/wiki/User-guide) on the
+[wiki](https://github.com/OpenGamma/ElSql/wiki/Home).
 
 
 Overview
