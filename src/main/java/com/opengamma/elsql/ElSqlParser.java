@@ -68,13 +68,10 @@ final class ElSqlParser {
    */
   private static final Pattern VALUE_PATTERN = Pattern.compile("[@]VALUE[(][:]([A-Za-z0-9_]+(?:@LOOPINDEX)?)[)](.*)");
   /**
-   * The regex for @LIKE :variable
+   * The regex for @LIKE and @EQUALS :variable
    */
-  private static final Pattern LIKE_VARIABLE_PATTERN = Pattern.compile("([^:])*([:][A-Za-z0-9_]+(?:@LOOPINDEX)?)(.*)");
+  private static final Pattern OPERATOR_VARIABLE_PATTERN = Pattern.compile("([^:])*([:][A-Za-z0-9_]+(?:@LOOPINDEX)?)(.*)");
   /**
-   * The regex for @EQUALS :variable
-   */
-  private static final Pattern EQUALS_VARIABLE_PATTERN = Pattern.compile("([^:])*([:][A-Za-z0-9_]+(?:@LOOPINDEX)?)(.*)");
 
   /**
    * The input.
@@ -278,10 +275,10 @@ final class ElSqlParser {
       parseIncludeTag(container, line);
       
     } else  if (trimmed.contains("@LIKE")) {
-      parseLikeTag(container, line);
+      parseOperatorTag(container, line, "@LIKE");
       
     } else  if (trimmed.contains("@EQUALS")) {
-        parseEqualsTag(container, line);
+      parseOperatorTag(container, line, "@EQUALS");
         
     } else  if (trimmed.contains("@OFFSETFETCH")) {
       parseOffsetFetchTag(container, line);
@@ -333,7 +330,7 @@ final class ElSqlParser {
   }
 
   /**
-   * Parse LIKE/ENDLIKE tag.
+   * Parse Operator (LIKE or EQUALS) tag and optional END tag (ENDLIKE or ENDEQUALS)
    * <p>
    * This tag can appear anywhere in a line.
    * The text before is treated as simple text.
@@ -342,66 +339,37 @@ final class ElSqlParser {
    * @param container  the container to add to, not null
    * @param line  the line to parse, not null
    */
-  private void parseLikeTag(ContainerSqlFragment container, Line line) {
-    Line[] split = line.split(line.lineTrimmed().indexOf("@LIKE"));
+  private void parseOperatorTag(ContainerSqlFragment container, Line line, String tagName)
+  {
+    Line[] split = line.split(line.lineTrimmed().indexOf(tagName));
     parseLine(container, split[0]);
     String trimmed = split[1].lineTrimmed();
     
-    String content = trimmed.substring(5);
-    int end = trimmed.indexOf("@ENDLIKE");
+    String content = trimmed.substring(tagName.length());
+    String endTag = "@END"+tagName.substring(1);
+    int end = trimmed.indexOf(endTag);
     int remainderIndex = trimmed.length();
     if (end >= 0) {
-      content = trimmed.substring(5, end);
-      remainderIndex = end + 8;
+      content = trimmed.substring(tagName.length(), end);
+      remainderIndex = end + endTag.length();
     }
     TextSqlFragment contentTextFragment = new TextSqlFragment(content, line.endOfLine());
-    Matcher matcher = LIKE_VARIABLE_PATTERN.matcher(content);
+    Matcher matcher = OPERATOR_VARIABLE_PATTERN.matcher(content);
     if (matcher.matches() == false) {
-      throw new IllegalArgumentException("@LIKE found with invalid format: " + line);
+      throw new IllegalArgumentException(tagName+" found with invalid format: " + line);
     }
-    LikeSqlFragment likeFragment = new LikeSqlFragment(matcher.group(2));
-    container.addFragment(likeFragment);
-    likeFragment.addFragment(contentTextFragment);
+    String variable = matcher.group(2);
+    OperatorSqlFragment operatorFragment = tagName.equals("@LIKE") 
+        ? new LikeSqlFragment(variable) 
+        : new EqualsSqlFragment(variable); 
+    
+    container.addFragment(operatorFragment);
+    operatorFragment.addFragment(contentTextFragment);
     
     Line subLine = split[1].split(remainderIndex)[1];
     parseLine(container, subLine);
   }
   
-  /**
-   * Parse EQUALS/ENDEQUALS tag.
-   * <p>
-   * This tag can appear anywhere in a line.
-   * The text before is treated as simple text.
-   * The text after is parsed.
-   * 
-   * @param container  the container to add to, not null
-   * @param line  the line to parse, not null
-   */
-  private void parseEqualsTag(ContainerSqlFragment container, Line line) {
-    Line[] split = line.split(line.lineTrimmed().indexOf("@EQUALS"));
-    parseLine(container, split[0]);
-    String trimmed = split[1].lineTrimmed();
-    
-    String content = trimmed.substring(7);
-    int end = trimmed.indexOf("@ENDEQUALS");
-    int remainderIndex = trimmed.length();
-    if (end >= 0) {
-      content = trimmed.substring(7, end);
-      remainderIndex = end + 10;
-    }
-    TextSqlFragment contentTextFragment = new TextSqlFragment(content, line.endOfLine());
-    Matcher matcher = EQUALS_VARIABLE_PATTERN.matcher(content);
-    if (matcher.matches() == false) {
-      throw new IllegalArgumentException("@EQUALS found with invalid format: " + line);
-    }
-    EqualsSqlFragment equalsFragment = new EqualsSqlFragment(matcher.group(2));
-    container.addFragment(equalsFragment);
-    equalsFragment.addFragment(contentTextFragment);
-    
-    Line subLine = split[1].split(remainderIndex)[1];
-    parseLine(container, subLine);
-  }  
-
   /**
    * Parse OFFSET/FETCH tag.
    * <p>

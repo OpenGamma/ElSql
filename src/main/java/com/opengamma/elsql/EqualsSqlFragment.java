@@ -7,12 +7,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
  * <p>
  * This handles switching between = and IS NULL based on the value of the parameter.
  */
-public final class EqualsSqlFragment extends ContainerSqlFragment {
-
-  /**
-   * The variable.
-   */
-  private final String _variable;
+public final class EqualsSqlFragment extends OperatorSqlFragment {
 
   /**
    * Creates an instance.
@@ -20,13 +15,7 @@ public final class EqualsSqlFragment extends ContainerSqlFragment {
    * @param variable the variable to base the LIKE on, not null
    */
   EqualsSqlFragment(String variable) {
-    if (variable == null) {
-      throw new IllegalArgumentException("Variable must be specified");
-    }
-    if (variable.startsWith(":") == false || variable.length() < 2) {
-      throw new IllegalArgumentException("Argument is not a variable (starting with a colon)");
-    }
-    _variable = variable.substring(1);
+    super(variable);
   }
 
   // -------------------------------------------------------------------------
@@ -41,11 +30,4 @@ public final class EqualsSqlFragment extends ContainerSqlFragment {
       super.toSQL(buf, bundle, paramSource, loopIndex);
     }
   }
-
-  // -------------------------------------------------------------------------
-  @Override
-  public String toString() {
-    return getClass().getSimpleName() + ":" + _variable + " " + getFragments();
-  }
-
 }
