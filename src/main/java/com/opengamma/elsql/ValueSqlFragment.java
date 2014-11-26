@@ -18,17 +18,23 @@ final class ValueSqlFragment extends SqlFragment {
    * The variable to output.
    */
   private final String _valueVariable;
+  /**
+   * Whether to follow with a space.
+   */
+  private final boolean _followWithSpace;
 
   /**
    * Creates an instance.
    * 
    * @param valueVariable  the value variable, not null
+   * @param followWithSpace  whether to follow by a space
    */
-  ValueSqlFragment(String valueVariable) {
+  ValueSqlFragment(String valueVariable, boolean followWithSpace) {
     if (valueVariable == null) {
       throw new IllegalArgumentException("Variable must be specified");
     }
     _valueVariable = valueVariable;
+    _followWithSpace = followWithSpace;
   }
 
   //-------------------------------------------------------------------------
@@ -38,6 +44,9 @@ final class ValueSqlFragment extends SqlFragment {
     Object value = paramSource.getValue(var);
     if (value != null) {
       buf.append(value);
+      if (_followWithSpace) {
+        buf.append(' ');
+      }
     }
   }
 

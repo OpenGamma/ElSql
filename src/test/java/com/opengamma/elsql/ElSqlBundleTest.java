@@ -780,12 +780,34 @@ public class ElSqlBundleTest {
   public void test_value() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
+        "  SELECT * FROM @VALUE(:var) WHERE true"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    MapSqlParameterSource source = new MapSqlParameterSource("var", "mytable");
+    String sql1 = bundle.getSql("Test1", source);
+    assertEquals("SELECT * FROM mytable WHERE true ", sql1);
+  }
+
+  public void test_value_followedByComma() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
         "  SELECT * FROM @VALUE(:var), vax"
     );
     ElSqlBundle bundle = ElSqlBundle.parse(lines);
     MapSqlParameterSource source = new MapSqlParameterSource("var", "mytable");
     String sql1 = bundle.getSql("Test1", source);
     assertEquals("SELECT * FROM mytable, vax ", sql1);
+  }
+
+  public void test_value_insertContainsComma() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM base @VALUE(:additionaltables)"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    MapSqlParameterSource source = new MapSqlParameterSource("additionaltables", ", mytable");
+    String sql1 = bundle.getSql("Test1", source);
+    assertEquals("SELECT * FROM base , mytable ", sql1);
   }
 
   public void test_value_null() {
