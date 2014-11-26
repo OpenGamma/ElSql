@@ -32,16 +32,6 @@ final class IncludeSqlFragment extends SqlFragment {
   }
 
   //-------------------------------------------------------------------------
-  /**
-   * Gets the include key.
-   * 
-   * @return the include key, not null
-   */
-  String getIncludeKey() {
-    return _includeKey;
-  }
-
-  //-------------------------------------------------------------------------
   @Override
   protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
     String key = _includeKey;

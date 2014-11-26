@@ -9,6 +9,7 @@ import static org.testng.AssertJUnit.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -20,6 +21,26 @@ import org.testng.annotations.Test;
 @Test
 public class ElSqlBundleTest {
 
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_invalidTab() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "\tSELECT * FROM foo"
+    );
+    ElSqlBundle.parse(lines);
+  }
+
+  public void test_name_1name_1line_noParameters() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    String sql1 = bundle.getSql("Test1");
+    assertEquals("SELECT * FROM foo ", sql1);
+  }
+
+  //-------------------------------------------------------------------------
   public void test_name_1name_1line() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -100,6 +121,15 @@ public class ElSqlBundleTest {
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_name_invalidFormat4() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "@NAME(Test2)"
+    );
+    ElSqlBundle.parse(lines);
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void test_name_notFound() {
     ElSqlBundle bundle = ElSqlBundle.parse(new ArrayList<String>());
     bundle.getSql("Unknown", new MapSqlParameterSource());
@@ -133,7 +163,7 @@ public class ElSqlBundleTest {
   }
 
   //-------------------------------------------------------------------------
-  public void test_insert_variable() {
+  public void test_include_variable() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
         "  SELECT * FROM @INCLUDE(:var) WHERE TRUE",
@@ -147,7 +177,7 @@ public class ElSqlBundleTest {
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
-  public void test_insert_variable_notFound() {
+  public void test_include_variable_notFound() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
         "  SELECT * FROM @INCLUDE(:var) WHERE TRUE",
@@ -155,6 +185,15 @@ public class ElSqlBundleTest {
     );
     ElSqlBundle bundle = ElSqlBundle.parse(lines);
     bundle.getSql("Test1", new MapSqlParameterSource());
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_include_invalidFormat1() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM @INCLUDE(:var WHERE TRUE"
+    );
+    ElSqlBundle.parse(lines);
   }
 
   //-------------------------------------------------------------------------
@@ -236,6 +275,16 @@ public class ElSqlBundleTest {
     assertEquals("SELECT * FROM foo WHERE (var LIKE :var ESCAPE '\\' ) ", sql1);
   }
 
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_like_invalidFormat1() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  WHERE (var @LIKE"
+    );
+    ElSqlBundle.parse(lines);
+  }
+
   //-------------------------------------------------------------------------
   public void test_equals_equals()  {
     List<String> lines = Arrays.asList(
@@ -279,6 +328,16 @@ public class ElSqlBundleTest {
     ElSqlBundle bundle = ElSqlBundle.parse(lines);
     String sql1 = bundle.getSql("Test1", new MapSqlParameterSource("var", null));
     assertEquals("SELECT * FROM foo WHERE (var IS NULL ) ", sql1);
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_equals_invalidFormat1() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  WHERE (var @EQUALS"
+    );
+    ElSqlBundle.parse(lines);
   }
 
   //-------------------------------------------------------------------------
@@ -341,6 +400,26 @@ public class ElSqlBundleTest {
     MapSqlParameterSource paramSource = new MapSqlParameterSource("offset", 7).addValue("fetch", 3);
     String sql1 = bundle.getSql("Test1", paramSource);
     assertEquals("SELECT * FROM foo ORDER BY bar OFFSET 7 ROWS FETCH NEXT 3 ROWS ONLY ", sql1);
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_paging_invalidFormat1() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  @PAGING(:offset, :fetch",
+        "    SELECT * FROM foo ORDER BY bar "
+    );
+    ElSqlBundle.parse(lines);
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_paging_invalidFormat2() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  @PAGING(:offset, :fetch)",
+        "  @PAGING(:offset, :fetch)"
+    );
+    ElSqlBundle.parse(lines);
   }
 
   //-------------------------------------------------------------------------
@@ -525,6 +604,54 @@ public class ElSqlBundleTest {
     assertEquals("SELECT * FROM foo ", sql1);
   }
 
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_if_invalidFormat1() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  @WHERE",
+        "    @IF(:var",
+        "      var = :var"
+    );
+    ElSqlBundle.parse(lines);
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_if_invalidFormat2() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  @WHERE",
+        "    @IF(:var)",
+        "    @IF(:var)"
+    );
+    ElSqlBundle.parse(lines);
+  }
+
+  //-------------------------------------------------------------------------
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_where_invalidFormat1() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  @WHERE true",
+        "    @AND(:var)",
+        "      var = :var"
+    );
+    ElSqlBundle.parse(lines);
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_where_invalidFormat2() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  @WHERE",
+        "  @WHERE"
+    );
+    ElSqlBundle.parse(lines);
+  }
+
   //-------------------------------------------------------------------------
   public void test_and_1and_varAbsent() {
     List<String> lines = Arrays.asList(
@@ -675,6 +802,30 @@ public class ElSqlBundleTest {
     ElSqlBundle.parse(lines);
   }
 
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_and_invalidFormat4() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  @WHERE",
+        "    @AND(:var",
+        "      var = :var"
+    );
+    ElSqlBundle.parse(lines);
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_and_invalidFormat5() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  @WHERE",
+        "    @AND(:var)",
+        "    @AND(:var)"
+    );
+    ElSqlBundle.parse(lines);
+  }
+
   //-------------------------------------------------------------------------
   public void test_or_1or_varAbsent() {
     List<String> lines = Arrays.asList(
@@ -746,6 +897,55 @@ public class ElSqlBundleTest {
     MapSqlParameterSource source = new MapSqlParameterSource("var", "val").addValue("vax", "val");
     String sql1 = bundle.getSql("Test1", source);
     assertEquals("SELECT * FROM foo WHERE var = :var OR vax = :vax ", sql1);
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_or_invalidFormat1() {
+    List<String> lines = Arrays.asList(
+        "@OR("
+    );
+    ElSqlBundle.parse(lines);
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_or_invalidFormat2() {
+    List<String> lines = Arrays.asList(
+        "@OR()"
+    );
+    ElSqlBundle.parse(lines);
+  }
+
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_or_invalidFormat3() {
+    List<String> lines = Arrays.asList(
+        "@OR(!)"
+    );
+    ElSqlBundle.parse(lines);
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_or_invalidFormat4() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  @WHERE",
+        "    @OR(:var",
+        "      var = :var"
+    );
+    ElSqlBundle.parse(lines);
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_or_invalidFormat5() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  @WHERE",
+        "    @OR(:var)",
+        "    @OR(:var)"
+    );
+    ElSqlBundle.parse(lines);
   }
 
   //-------------------------------------------------------------------------
@@ -821,7 +1021,7 @@ public class ElSqlBundleTest {
     assertEquals("SELECT * FROM base ", sql1);
   }
 
-  public void test_valueLike() {
+  public void test_value_like() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
         "  SELECT DISTINCT doc_id FROM main",
@@ -835,7 +1035,7 @@ public class ElSqlBundleTest {
         "AND doc.id IN ( SELECT id FROM mytable_idkey WHERE key_scheme = :scheme ) ", sql1);
   }
 
-  public void test_valueFetch() {
+  public void test_value_fetch() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
         "  AA @VALUE(:var) @FETCH"
@@ -844,6 +1044,15 @@ public class ElSqlBundleTest {
     MapSqlParameterSource source = new MapSqlParameterSource("var", "mytable").addValue("paging_fetch", 10);
     String sql1 = bundle.getSql("Test1", source);
     assertEquals("AA mytable FETCH FIRST 10 ROWS ONLY ", sql1);
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_value_invalidFormat1() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  AA @VALUE(:var @FETCH"
+    );
+    ElSqlBundle.parse(lines);
   }
 
   //-------------------------------------------------------------------------
@@ -954,6 +1163,21 @@ public class ElSqlBundleTest {
       .addValue("a1", "type").addValue("b1", "doctor");
     String sql1 = bundle.getSql("Test1", source);
     assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = bob) OR (a = :a1 AND b = doctor) ", sql1);
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_loop_sizeBadType() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo WHERE",
+        "  @LOOP(:size)",
+        "    (a = :a@LOOPINDEX AND b = :b@LOOPINDEX)",
+        "    @LOOPJOIN OR"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    MapSqlParameterSource source = new MapSqlParameterSource("size", new Date())
+      .addValue("a0", "name").addValue("b0", "bob");
+    bundle.getSql("Test1", source);
   }
 
 }
