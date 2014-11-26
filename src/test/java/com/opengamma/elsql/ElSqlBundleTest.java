@@ -190,6 +190,17 @@ public class ElSqlBundleTest {
     String sql1 = bundle.getSql("Test1", new MapSqlParameterSource("var", "va_"));
     assertEquals("SELECT * FROM foo WHERE var LIKE :var ", sql1);
   }
+  
+  public void test_like_isnull() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  WHERE var @LIKE :var"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    String sql1 = bundle.getSql("Test1", new MapSqlParameterSource("var", null));
+    assertEquals("SELECT * FROM foo WHERE var IS NULL ", sql1);
+  }  
 
   public void test_likeEndLike_equals() {
     List<String> lines = Arrays.asList(
@@ -223,6 +234,51 @@ public class ElSqlBundleTest {
     bundle = bundle.withConfig(ElSqlConfig.HSQL);
     String sql1 = bundle.getSql("Test1", new MapSqlParameterSource("var", "va%l"));
     assertEquals("SELECT * FROM foo WHERE (var LIKE :var ESCAPE '\\' ) ", sql1);
+  }
+  
+  //-------------------------------------------------------------------------
+  public void test_equals_equals()  {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  WHERE var @EQUALS :var"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    String sql1 = bundle.getSql("Test1", new MapSqlParameterSource("var", "val"));
+    assertEquals("SELECT * FROM foo WHERE var = :var ", sql1);   
+  }
+  
+  public void test_equals_isnull() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  WHERE var @EQUALS :var"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    String sql1 = bundle.getSql("Test1", new MapSqlParameterSource("var", null));
+    assertEquals("SELECT * FROM foo WHERE var IS NULL ", sql1);       
+  }
+  
+  public void test_equalsEndEquals_equals() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  WHERE (var @EQUALS :var @ENDEQUALS)"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    String sql1 = bundle.getSql("Test1", new MapSqlParameterSource("var", "val"));
+    assertEquals("SELECT * FROM foo WHERE (var = :var ) ", sql1);
+  }
+  
+  public void test_equalsEndEquals_isnull() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  WHERE (var @EQUALS :var @ENDEQUALS)"
+    );
+    ElSqlBundle bundle = ElSqlBundle.parse(lines);
+    String sql1 = bundle.getSql("Test1", new MapSqlParameterSource("var", null));
+    assertEquals("SELECT * FROM foo WHERE (var IS NULL ) ", sql1);
   }
 
   //-------------------------------------------------------------------------
