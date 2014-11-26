@@ -5,8 +5,6 @@
  */
 package com.opengamma.elsql;
 
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-
 /**
  * Representation of IF(expression).
  * <p>
@@ -26,9 +24,9 @@ final class IfSqlFragment extends ConditionalSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
-    if (isMatch(paramSource, loopIndex)) {
-      super.toSQL(buf, bundle, paramSource, loopIndex);
+  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParams params, int loopIndex) {
+    if (isMatch(params, loopIndex)) {
+      super.toSQL(buf, bundle, params, loopIndex);
     }
   }
 

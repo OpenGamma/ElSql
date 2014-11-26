@@ -5,8 +5,6 @@
  */
 package com.opengamma.elsql;
 
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-
 /**
  * Representation of paging over an SQL clause.
  */
@@ -34,14 +32,14 @@ final class PagingSqlFragment extends ContainerSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
+  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParams params, int loopIndex) {
     int oldLen = buf.length();
-    super.toSQL(buf, bundle, paramSource, loopIndex);
+    super.toSQL(buf, bundle, params, loopIndex);
     int newLen = buf.length();
     String select = buf.substring(oldLen, newLen);
     if (select.startsWith("SELECT ")) {
       buf.setLength(oldLen);
-      buf.append(applyPaging(select, bundle, paramSource));
+      buf.append(applyPaging(select, bundle, params));
     }
   }
 
@@ -50,16 +48,16 @@ final class PagingSqlFragment extends ContainerSqlFragment {
    * 
    * @param selectToPage  the contents of the enclosed block, not null
    * @param bundle  the elsql bundle for context, not null
-   * @param paramSource  the SQL parameters, not null
+   * @param params  the SQL arguments, not null
    */
-  protected String applyPaging(String selectToPage, ElSqlBundle bundle, SqlParameterSource paramSource) {
+  protected String applyPaging(String selectToPage, ElSqlBundle bundle, SqlParams params) {
     int offset = 0;
     int fetchLimit = 0;
-    if (_offsetVariable != null && paramSource.hasValue(_offsetVariable)) {
-      offset = ((Number) paramSource.getValue(_offsetVariable)).intValue();
+    if (_offsetVariable != null && params.contains(_offsetVariable)) {
+      offset = ((Number) params.get(_offsetVariable)).intValue();
     }
-    if (paramSource.hasValue(_fetchVariable)) {
-      fetchLimit = ((Number) paramSource.getValue(_fetchVariable)).intValue();
+    if (params.contains(_fetchVariable)) {
+      fetchLimit = ((Number) params.get(_fetchVariable)).intValue();
     } else if (_fetchVariable.matches("[0-9]+")) {
       fetchLimit = Integer.parseInt(_fetchVariable);
     }

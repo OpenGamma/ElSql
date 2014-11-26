@@ -5,8 +5,6 @@
  */
 package com.opengamma.elsql;
 
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-
 /**
  * Representation of VALUE(variable).
  * <p>
@@ -39,9 +37,9 @@ final class ValueSqlFragment extends SqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
+  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParams params, int loopIndex) {
     String var = applyLoopIndex(_valueVariable, loopIndex);
-    Object value = paramSource.getValue(var);
+    Object value = params.get(var);
     if (value != null) {
       buf.append(value);
       if (_followWithSpace) {

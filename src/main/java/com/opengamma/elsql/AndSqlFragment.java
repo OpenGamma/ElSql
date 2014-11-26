@@ -5,8 +5,6 @@
  */
 package com.opengamma.elsql;
 
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-
 /**
  * Representation of AND(expression).
  * <p>
@@ -27,12 +25,12 @@ final class AndSqlFragment extends ConditionalSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
-    if (isMatch(paramSource, loopIndex)) {
+  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParams params, int loopIndex) {
+    if (isMatch(params, loopIndex)) {
       if (endsWith(buf, " WHERE ") == false && endsWith(buf, " AND ") == false) {
         buf.append("AND ");
       }
-      super.toSQL(buf, bundle, paramSource, loopIndex);
+      super.toSQL(buf, bundle, params, loopIndex);
     }
   }
 

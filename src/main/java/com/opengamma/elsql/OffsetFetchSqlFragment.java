@@ -5,8 +5,6 @@
  */
 package com.opengamma.elsql;
 
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-
 /**
  * Representation of OFFSETFETCH.
  * <p>
@@ -46,14 +44,14 @@ final class OffsetFetchSqlFragment extends ContainerSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
+  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParams params, int loopIndex) {
     int offset = 0;
     int fetchLimit = 0;
-    if (_offsetVariable != null && paramSource.hasValue(_offsetVariable)) {
-      offset = ((Number) paramSource.getValue(_offsetVariable)).intValue();
+    if (_offsetVariable != null && params.contains(_offsetVariable)) {
+      offset = ((Number) params.get(_offsetVariable)).intValue();
     }
-    if (paramSource.hasValue(_fetchVariable)) {
-      fetchLimit = ((Number) paramSource.getValue(_fetchVariable)).intValue();
+    if (params.contains(_fetchVariable)) {
+      fetchLimit = ((Number) params.get(_fetchVariable)).intValue();
     } else if (_fetchVariable.matches("[0-9]+")) {
       fetchLimit = Integer.parseInt(_fetchVariable);
     }

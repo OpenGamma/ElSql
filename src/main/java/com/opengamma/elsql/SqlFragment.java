@@ -5,8 +5,6 @@
  */
 package com.opengamma.elsql;
 
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-
 /**
  * Single fragment in the elsql AST.
  */
@@ -17,10 +15,10 @@ abstract class SqlFragment {
    * 
    * @param buf  the buffer to append to, not null
    * @param bundle  the elsql bundle for context, not null
-   * @param paramSource  the SQL parameters, not null
+   * @param params  the SQL parameters, not null
    * @param loopIndex  the current loopIndex
    */
-  protected abstract void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex);
+  protected abstract void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParams params, int loopIndex);
 
   /**
    * Applies the loop index to the string.
