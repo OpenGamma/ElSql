@@ -12,7 +12,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
  * <p>
  * This handles switching between = and IS NULL based on the value of the parameter.
  */
-public final class EqualsSqlFragment extends OperatorSqlFragment {
+final class EqualsSqlFragment extends OperatorSqlFragment {
 
   /**
    * Creates an instance.

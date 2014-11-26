@@ -8,7 +8,7 @@ package com.opengamma.elsql;
 /**
  * Representation of a binary operator which mutates based upon the bound variable on the right hand side.
  */
-public class OperatorSqlFragment extends ContainerSqlFragment {
+abstract class OperatorSqlFragment extends ContainerSqlFragment {
   
   /**
    * The variable.
