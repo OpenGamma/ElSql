@@ -31,8 +31,7 @@ final class LikeSqlFragment extends OperatorSqlFragment {
     if (val == null) {
       buf.append("IS NULL ");
     } else {
-      String value = (val == null ? "" : val.toString());
-      if (bundle.getConfig().isLikeWildcard(value)) {
+      if (bundle.getConfig().isLikeWildcard(val.toString())) {
         buf.append("LIKE ");
         super.toSQL(buf, bundle, paramSource, loopIndex);
         buf.append(bundle.getConfig().getLikeSuffix());

@@ -87,7 +87,7 @@
  * &#064;EQUALS sqlWithVariable<br />
  * &#064;EQUALS(variable)<br />
  * The equals tag adds either an SQL = or an SQL IS NULL based on the specified variable.
- * If the tag has no variable in brackets, then the text between the like tag and the end
+ * If the tag has no variable in brackets, then the text between the equals tag and the end
  * of the line is parsed for a variable.
  * <p>
  * &#064;ENDEQUALS<br />

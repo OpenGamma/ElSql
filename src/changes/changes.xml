@@ -9,6 +9,11 @@
 
     <!-- types are add, fix, remove, update -->
     <release version="1.0" date="" description="v1.0">
+      <action dev="jodastephen" type="add">
+        Support null values in LIKE tag.
+        Add new EQUALS tag handling null.
+        Fixes #8.
+      </action>
       <action dev="jodastephen" type="fix">
         Support null values in `SqlParameterSource` map within conditional and value tags.
         Fixes #8.

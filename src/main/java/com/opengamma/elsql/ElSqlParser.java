@@ -339,14 +339,13 @@ final class ElSqlParser {
    * @param container  the container to add to, not null
    * @param line  the line to parse, not null
    */
-  private void parseOperatorTag(ContainerSqlFragment container, Line line, String tagName)
-  {
+  private void parseOperatorTag(ContainerSqlFragment container, Line line, String tagName) {
     Line[] split = line.split(line.lineTrimmed().indexOf(tagName));
     parseLine(container, split[0]);
     String trimmed = split[1].lineTrimmed();
     
     String content = trimmed.substring(tagName.length());
-    String endTag = "@END"+tagName.substring(1);
+    String endTag = "@END" + tagName.substring(1);
     int end = trimmed.indexOf(endTag);
     int remainderIndex = trimmed.length();
     if (end >= 0) {
@@ -356,12 +355,12 @@ final class ElSqlParser {
     TextSqlFragment contentTextFragment = new TextSqlFragment(content, line.endOfLine());
     Matcher matcher = OPERATOR_VARIABLE_PATTERN.matcher(content);
     if (matcher.matches() == false) {
-      throw new IllegalArgumentException(tagName+" found with invalid format: " + line);
+      throw new IllegalArgumentException(tagName + " found with invalid format: " + line);
     }
     String variable = matcher.group(2);
-    OperatorSqlFragment operatorFragment = tagName.equals("@LIKE") 
-        ? new LikeSqlFragment(variable) 
-        : new EqualsSqlFragment(variable); 
+    OperatorSqlFragment operatorFragment = tagName.equals("@LIKE")
+        ? new LikeSqlFragment(variable)
+        : new EqualsSqlFragment(variable);
     
     container.addFragment(operatorFragment);
     operatorFragment.addFragment(contentTextFragment);
@@ -369,7 +368,7 @@ final class ElSqlParser {
     Line subLine = split[1].split(remainderIndex)[1];
     parseLine(container, subLine);
   }
-  
+
   /**
    * Parse OFFSET/FETCH tag.
    * <p>
