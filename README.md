@@ -5,7 +5,8 @@ Manage SQL external to a Java application.
 ElSql. Short for "External SQL".
 Pronounced "else-Q-L" where the letters are pronounced quicker than the "else".
 
-Available in [Maven Cental](http://search.maven.org/#search|ga|1|a%3A%22elsql%22).
+Available in [Maven Cental](http://search.maven.org/#search|ga|1|a%3A%22elsql%22)
+with **no dependencies**.
 Read the [user guide](https://github.com/OpenGamma/ElSql/wiki/User-guide) on the
 [wiki](https://github.com/OpenGamma/ElSql/wiki/Home).
 
@@ -22,7 +23,7 @@ The main techniques are:
 * reading in an external file, such as a properties file
 
 This library focuses on the last of these - using an external file.
-It is designed for use with Spring, and uses the Spring SqlParameterSource class.
+It is a standalone library with no dependencies.
 The key benefit is a simple external file that a DBA can understand, something
 which is invaluable for later maintenance and debugging.
 
@@ -48,13 +49,35 @@ common difficult cases. The file has the suffix ".elsql":
 * tags start with the @ symbol
 * the primary blocks are @NAME(name) - the name refers to the block
 * indentation is used to create blocks - indented lines "belong" to the parent less-indented line
-* variables start with a colon, as this is integrated with Spring
+* variables start with a colon
 * the various tags aim to handle over 80% of your needs
 
 It is not intended that the DSL format should handle all cases, as that would be too complex.
 The most complex cases should probably be dealt with in normal Java code.
 The file can also be [overridden in parts](https://github.com/OpenGamma/ElSql/wiki/Configuration),
 which allows weird database SQL syntaxes to be handled.
+
+
+Usage
+-----
+
+The library can be used with no dependencies.
+To do this, use the `ElSql` class as the main entry point.
+
+```java
+ ElSql bundle = ElSql.of(ElSqlConfig.HSQL, MyDao.class);
+ String sql = bundle.getSql("InsertCustomer", mapOfSqlParameters);
+```
+
+This loads the .elsql files for the HSQL database associated with the `MyDao` class.
+It expects to find the .elsql files on the classpath in the same package as `MyDao`.
+
+Built in support is also provided for Spring via the `Resource` and `SqlParameterSource` abstractions.
+This is via an optional dependency in the Maven pom.
+To use this, use the `ElSqlBundle` class as the main entry point instead of `ElSql`.
+
+The colon prefixed variables used by ElSql can be interpreted by other tools,
+such as [JDBI](http://jdbi.org/) and [Spring](http://docs.spring.io/spring-framework/docs/current/spring-framework-reference/html/jdbc.html).
 
 
 Motivation
@@ -86,7 +109,7 @@ Some useful project links:
 
 * [User guide](https://github.com/OpenGamma/ElSql/wiki/User-guide) - a longer user guide
 * [Wiki](https://github.com/OpenGamma/ElSql/wiki/Home) - including an [example](https://github.com/OpenGamma/ElSql/wiki/Example)
-* [Javadoc](http://opengamma.github.com/ElSql/apidocs/index.html) - the two public classes
+* [Javadoc](http://opengamma.github.com/ElSql/apidocs/index.html) - the six public classes
 * [Issue tracker](https://github.com/OpenGamma/ElSql/issues) - raise bugs or enhancement requests here
 * [Project sponsor](http://developers.opengamma.com/) - the project is supported by OpenGamma
 
