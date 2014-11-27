@@ -32,14 +32,14 @@ final class PagingSqlFragment extends ContainerSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParams params, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
     int oldLen = buf.length();
-    super.toSQL(buf, bundle, params, loopIndex);
+    super.toSQL(buf, fragments, params, loopIndex);
     int newLen = buf.length();
     String select = buf.substring(oldLen, newLen);
     if (select.startsWith("SELECT ")) {
       buf.setLength(oldLen);
-      buf.append(applyPaging(select, bundle, params));
+      buf.append(applyPaging(select, fragments, params));
     }
   }
 
@@ -47,10 +47,10 @@ final class PagingSqlFragment extends ContainerSqlFragment {
    * Applies the paging.
    * 
    * @param selectToPage  the contents of the enclosed block, not null
-   * @param bundle  the elsql bundle for context, not null
+   * @param fragments  the SQL fragments for context, not null
    * @param params  the SQL arguments, not null
    */
-  protected String applyPaging(String selectToPage, ElSqlBundle bundle, SqlParams params) {
+  String applyPaging(String selectToPage, SqlFragments fragments, SqlParams params) {
     int offset = 0;
     int fetchLimit = 0;
     if (_offsetVariable != null && params.contains(_offsetVariable)) {
@@ -61,7 +61,7 @@ final class PagingSqlFragment extends ContainerSqlFragment {
     } else if (_fetchVariable.matches("[0-9]+")) {
       fetchLimit = Integer.parseInt(_fetchVariable);
     }
-    return bundle.getConfig().addPaging(selectToPage, offset, fetchLimit == Integer.MAX_VALUE ? 0 : fetchLimit);
+    return fragments.getConfig().addPaging(selectToPage, offset, fetchLimit == Integer.MAX_VALUE ? 0 : fetchLimit);
   }
 
   //-------------------------------------------------------------------------

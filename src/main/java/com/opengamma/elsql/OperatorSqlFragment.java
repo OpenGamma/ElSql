@@ -13,7 +13,7 @@ abstract class OperatorSqlFragment extends ContainerSqlFragment {
   /**
    * The variable.
    */
-  protected final String _variable;
+  final String _variable;
 
   /**
    * Creates an instance.

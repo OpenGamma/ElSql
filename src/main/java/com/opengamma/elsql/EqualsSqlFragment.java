@@ -23,14 +23,14 @@ final class EqualsSqlFragment extends OperatorSqlFragment {
 
   // -------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParams params, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
     String var = applyLoopIndex(_variable, loopIndex);
     Object val = params.get(var);
     if (val == null) {
       buf.append("IS NULL ");
     } else {
       buf.append("= ");
-      super.toSQL(buf, bundle, params, loopIndex);
+      super.toSQL(buf, fragments, params, loopIndex);
     }
   }
 

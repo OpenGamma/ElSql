@@ -10,16 +10,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 /**
- * A bundle of elsql formatted SQL.
+ * Provides access to a bundle of elsql formatted SQL, integrated with the Spring framework.
  * <p>
  * The bundle encapsulates the SQL needed for a particular feature.
  * This will typically correspond to a data access object, or set of related tables.
@@ -29,13 +27,9 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 public final class ElSqlBundle {
 
   /**
-   * The map of known elsql.
+   * The fragments.
    */
-  private final Map<String, NameSqlFragment> _map;
-  /**
-   * The config.
-   */
-  private final ElSqlConfig _config;
+  private final SqlFragments _fragments;
 
   /**
    * Loads external SQL based for the specified type.
@@ -102,23 +96,14 @@ public final class ElSqlBundle {
         files.add(lines);
       }
     }
-    return parse(files, config);
+    return new ElSqlBundle(SqlFragments.parse(files, config));
   }
 
   // package scoped for testing
   static ElSqlBundle parse(List<String> lines) {
     ArrayList<List<String>> files = new ArrayList<List<String>>();
     files.add(lines);
-    return parse(files, ElSqlConfig.DEFAULT);
-  }
-
-  private static ElSqlBundle parse(List<List<String>> files, ElSqlConfig config) {
-    Map<String, NameSqlFragment> parsed = new LinkedHashMap<String, NameSqlFragment>();
-    for (List<String> lines : files) {
-      ElSqlParser parser = new ElSqlParser(lines);
-      parsed.putAll(parser.parse());
-    }
-    return new ElSqlBundle(parsed, config);
+    return new ElSqlBundle(SqlFragments.parse(files, ElSqlConfig.DEFAULT));
   }
 
   private static List<String> loadResource(Resource resource) {
@@ -146,20 +131,15 @@ public final class ElSqlBundle {
   }
 
   /**
-   * Creates an instance..
+   * Creates an instance.
    * 
-   * @param map  the map of names, not null
-   * @param config  the config to use, not null
+   * @param fragments  the fragments to use, not null
    */
-  private ElSqlBundle(Map<String, NameSqlFragment> map, ElSqlConfig config) {
-    if (map == null) {
+  private ElSqlBundle(SqlFragments fragments) {
+    if (fragments == null) {
       throw new IllegalArgumentException("Fragment map must not be null");
     }
-    if (config == null) {
-      throw new IllegalArgumentException("Config must not be null");
-    }
-    _map = map;
-    _config = config;
+    _fragments = fragments;
   }
 
   //-------------------------------------------------------------------------
@@ -169,7 +149,7 @@ public final class ElSqlBundle {
    * @return the config, not null
    */
   public ElSqlConfig getConfig() {
-    return _config;
+    return _fragments.getConfig();
   }
 
   /**
@@ -181,7 +161,7 @@ public final class ElSqlBundle {
    * @return a bundle with the config updated, not null
    */
   public ElSqlBundle withConfig(ElSqlConfig config) {
-    return new ElSqlBundle(_map, config);
+    return new ElSqlBundle(_fragments.withConfig(config));
   }
 
   //-------------------------------------------------------------------------
@@ -198,7 +178,7 @@ public final class ElSqlBundle {
    * @throws RuntimeException if a problem occurs
    */
   public String getSql(String name) {
-    return getSql(name, new EmptySource());
+    return _fragments.getSql(name, EmptySqlParams.INSTANCE);
   }
 
   /**
@@ -213,53 +193,7 @@ public final class ElSqlBundle {
    * @throws RuntimeException if a problem occurs
    */
   public String getSql(String name, SqlParameterSource paramSource) {
-    NameSqlFragment fragment = getFragment(name);
-    StringBuilder buf = new StringBuilder(1024);
-    fragment.toSQL(buf, this, new SpringSqlParams(paramSource), -1);
-    return buf.toString();
-  }
-
-  //-------------------------------------------------------------------------
-  /**
-   * Gets a fragment by name.
-   * 
-   * @param name  the name, not null
-   * @return the fragment, not null
-   * @throws IllegalArgumentException if there is no fragment with the specified name
-   */
-  NameSqlFragment getFragment(String name) {
-    NameSqlFragment fragment = _map.get(name);
-    if (fragment == null) {
-      throw new IllegalArgumentException("Unknown fragment name: " + name);
-    }
-    return fragment;
-  }
-
-  //-------------------------------------------------------------------------
-  /**
-   * An empty parameter source.
-   * Using this reduces coupling with the Spring librray.
-   */
-  private final class EmptySource implements SqlParameterSource {
-    @Override
-    public boolean hasValue(String field) {
-      return false;
-    }
-  
-    @Override
-    public int getSqlType(String field) {
-      return TYPE_UNKNOWN;
-    }
-  
-    @Override
-    public String getTypeName(String field) {
-      throw new IllegalArgumentException();
-    }
-  
-    @Override
-    public Object getValue(String field) throws IllegalArgumentException {
-      return null;
-    }
+    return _fragments.getSql(name, new SpringSqlParams(paramSource));
   }
 
 }

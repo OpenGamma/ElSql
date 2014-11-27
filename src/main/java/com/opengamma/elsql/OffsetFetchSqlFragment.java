@@ -44,7 +44,7 @@ final class OffsetFetchSqlFragment extends ContainerSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParams params, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
     int offset = 0;
     int fetchLimit = 0;
     if (_offsetVariable != null && params.contains(_offsetVariable)) {
@@ -55,7 +55,7 @@ final class OffsetFetchSqlFragment extends ContainerSqlFragment {
     } else if (_fetchVariable.matches("[0-9]+")) {
       fetchLimit = Integer.parseInt(_fetchVariable);
     }
-    buf.append(bundle.getConfig().getPaging(offset, fetchLimit == Integer.MAX_VALUE ? 0 : fetchLimit));
+    buf.append(fragments.getConfig().getPaging(offset, fetchLimit == Integer.MAX_VALUE ? 0 : fetchLimit));
   }
 
   //-------------------------------------------------------------------------

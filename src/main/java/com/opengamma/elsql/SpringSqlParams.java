@@ -8,9 +8,9 @@ package com.opengamma.elsql;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 /**
- * Provides access to SQL parameters.
+ * Provides access to SQL parameters from Spring.
  * <p>
- * This interface abstracts the mechanism of obtaining the SQL parameters.
+ * This class has a dependency on the Spring framework.
  */
 final class SpringSqlParams implements SqlParams {
 
@@ -28,22 +28,13 @@ final class SpringSqlParams implements SqlParams {
     _source = source;
   }
 
-  /**
-   * Checks whether the variable exists.
-   * 
-   * @param variable  the variable
-   * @return true if it exists
-   */
+  //-------------------------------------------------------------------------
+  @Override
   public boolean contains(String variable) {
     return _source.hasValue(variable);
   }
 
-  /**
-   * Gets the variable, returning null if not found.
-   * 
-   * @param variable  the variable
-   * @return the value associated with the variable
-   */
+  @Override
   public Object get(String variable) {
     return (_source.hasValue(variable) ? _source.getValue(variable) : null);
   }

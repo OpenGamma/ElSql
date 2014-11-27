@@ -20,11 +20,11 @@ final class WhereSqlFragment extends ContainerSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParams params, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
     int oldLen = buf.length();
     buf.append("WHERE ");
     int newLen = buf.length();
-    super.toSQL(buf, bundle, params, loopIndex);
+    super.toSQL(buf, fragments, params, loopIndex);
     if (buf.length() == newLen) {
       buf.setLength(oldLen);
     }

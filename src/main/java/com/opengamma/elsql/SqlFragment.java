@@ -14,11 +14,11 @@ abstract class SqlFragment {
    * Convert this fragment to SQL, appending it to the specified buffer.
    * 
    * @param buf  the buffer to append to, not null
-   * @param bundle  the elsql bundle for context, not null
+   * @param fragments  the SQL fragments for context, not null
    * @param params  the SQL parameters, not null
    * @param loopIndex  the current loopIndex
    */
-  protected abstract void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParams params, int loopIndex);
+  abstract void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex);
 
   /**
    * Applies the loop index to the string.
@@ -27,7 +27,7 @@ abstract class SqlFragment {
    * @param loopIndex  the loop index
    * @return the applied text, not null
    */
-  protected String applyLoopIndex(String text, int loopIndex) {
+  String applyLoopIndex(String text, int loopIndex) {
     return text.replace("@LOOPINDEX", Integer.toString(loopIndex));
   }
 

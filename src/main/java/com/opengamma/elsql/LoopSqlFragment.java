@@ -28,7 +28,7 @@ final class LoopSqlFragment extends ContainerSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParams params, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
     // find loop size
     Object sizeObj = params.get(_sizeVariable);
     int size;
@@ -43,7 +43,7 @@ final class LoopSqlFragment extends ContainerSqlFragment {
     for (int i = 0; i < size; i++) {
       // index
       StringBuilder part = new StringBuilder();
-      super.toSQL(part, bundle, params, i);
+      super.toSQL(part, fragments, params, i);
       int joinIndex = part.indexOf("@LOOPJOIN ");
       if (joinIndex >= 0) {
         if (i >= (size - 1)) {
