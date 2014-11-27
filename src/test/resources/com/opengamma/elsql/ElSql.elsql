@@ -1,0 +1,7 @@
+-- An elsql file for testing and sample purposes
+-- The names in this file will be used unless overridden in a database specific file
+@NAME(TestFoo)
+  SELECT * FROM foo
+
+@NAME(TestBar)
+  SELECT * FROM bar

@@ -5,12 +5,14 @@
  */
 package com.opengamma.elsql;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Provides access to SQL parameters from a map.
  */
-final class MapSqlParams implements SqlParams {
+public final class MapSqlParams implements SqlParams {
 
   /**
    * The source.
@@ -20,10 +22,38 @@ final class MapSqlParams implements SqlParams {
   /**
    * Creates an instance based on a map.
    * 
-   * @param map  the map
+   * @param map  the map, which is assigned, not copied
    */
-  MapSqlParams(Map<String, Object> map) {
+  public MapSqlParams(Map<String, Object> map) {
+    if (map == null) {
+      throw new IllegalArgumentException("Map must not be null");
+    }
     _map = map;
+  }
+
+  /**
+   * Creates an instance based on one key-value pair.
+   * 
+   * @param key  the key
+   * @param value  the value
+   */
+  public MapSqlParams(String key, Object value) {
+    _map = Collections.singletonMap(key, value);
+  }
+
+  //-------------------------------------------------------------------------
+  /**
+   * Returns a new instance with the specified key-value pair added.
+   * <p>
+   * This copies the internal map and calls {@link Map#put(Object, Object)}.
+   * 
+   * @param key  the key to add
+   * @param value  the value to add
+   */
+  public MapSqlParams with(String key, Object value) {
+    Map<String, Object> map = new HashMap<String, Object>(_map);
+    map.put(key, value);
+    return new MapSqlParams(map);
   }
 
   //-------------------------------------------------------------------------

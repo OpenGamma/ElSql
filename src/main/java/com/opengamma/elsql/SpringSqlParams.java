@@ -12,7 +12,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
  * <p>
  * This class has a dependency on the Spring framework.
  */
-final class SpringSqlParams implements SqlParams {
+public final class SpringSqlParams implements SqlParams {
 
   /**
    * The source.
@@ -25,6 +25,9 @@ final class SpringSqlParams implements SqlParams {
    * @param source  the source
    */
   public SpringSqlParams(SqlParameterSource source) {
+    if (source == null) {
+      throw new IllegalArgumentException("Source must not be null");
+    }
     _source = source;
   }
 

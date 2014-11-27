@@ -1,0 +1,5 @@
+-- An override file for the HSQL database
+-- When loading resources, the name "TestBar" will override that in ElSql.eqsql
+-- if the config is for HSQL
+@NAME(TestBar)
+  SELECT * FROM bar, foo

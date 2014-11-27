@@ -10,7 +10,7 @@ package com.opengamma.elsql;
  * <p>
  * This interface abstracts the mechanism of obtaining the SQL parameters.
  */
-interface SqlParams {
+public interface SqlParams {
 
   /**
    * Checks whether the variable exists.

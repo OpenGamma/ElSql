@@ -5,6 +5,12 @@
  */
 package com.opengamma.elsql;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +32,50 @@ final class SqlFragments {
   private final ElSqlConfig _config;
 
   //-------------------------------------------------------------------------
+  // parse a set of resources, where names in later resources override names in earlier ones
+  static SqlFragments parseResource(URL[] resources, ElSqlConfig config) {
+    List<List<String>> files = new ArrayList<List<String>>();
+    for (URL resource : resources) {
+      if (resource != null) {
+        List<String> lines = loadResource(resource);
+        files.add(lines);
+      }
+    }
+    return parse(files, config);
+  }
+
+  // convert a resource to a list of lines
+  static List<String> loadResource(URL resource) {
+    InputStream in = null;
+    try {
+      in = resource.openStream();
+      BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+      List<String> list = new ArrayList<String>();
+      String line = reader.readLine();
+      while (line != null) {
+          list.add(line);
+          line = reader.readLine();
+      }
+      return list;
+    } catch (IOException ex) {
+      throw new RuntimeException(ex);
+    } finally {
+      try {
+        if (in != null) {
+          in.close();
+        }
+      } catch (IOException ignored) {
+      }
+    }
+  }
+
+  // package scoped for testing
+  static SqlFragments parse(List<String> lines) {
+    ArrayList<List<String>> files = new ArrayList<List<String>>();
+    files.add(lines);
+    return parse(files, ElSqlConfig.DEFAULT);
+  }
+
   // parse the files
   static SqlFragments parse(List<List<String>> files, ElSqlConfig config) {
     Map<String, NameSqlFragment> parsed = new LinkedHashMap<String, NameSqlFragment>();
