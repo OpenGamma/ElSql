@@ -5,8 +5,6 @@
  */
 package com.opengamma.elsql;
 
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-
 /**
  * Representation of EQUALS(variable).
  * <p>
@@ -25,14 +23,15 @@ final class EqualsSqlFragment extends OperatorSqlFragment {
 
   // -------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
     String var = applyLoopIndex(_variable, loopIndex);
-    Object val = paramSource.getValue(var);
+    Object val = params.get(var);
     if (val == null) {
       buf.append("IS NULL ");
     } else {
       buf.append("= ");
-      super.toSQL(buf, bundle, paramSource, loopIndex);
+      super.toSQL(buf, fragments, params, loopIndex);
     }
   }
+
 }

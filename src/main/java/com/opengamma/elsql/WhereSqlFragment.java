@@ -5,8 +5,6 @@
  */
 package com.opengamma.elsql;
 
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-
 /**
  * Representation of WHERE.
  * <p>
@@ -22,11 +20,11 @@ final class WhereSqlFragment extends ContainerSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
     int oldLen = buf.length();
     buf.append("WHERE ");
     int newLen = buf.length();
-    super.toSQL(buf, bundle, paramSource, loopIndex);
+    super.toSQL(buf, fragments, params, loopIndex);
     if (buf.length() == newLen) {
       buf.setLength(oldLen);
     }

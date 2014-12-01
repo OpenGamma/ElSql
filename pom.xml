@@ -79,17 +79,6 @@
         </includes>
       </resource>
     </resources>
-    <testResources>
-      <testResource>
-        <targetPath>.</targetPath>
-        <directory>${project.build.testSourceDirectory}</directory>
-        <includes>
-          <include>**/*.properties</include>
-          <include>**/*.dat</include>
-          <include>**/*.elsql</include>
-        </includes>
-      </testResource>
-    </testResources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -281,10 +270,9 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
       <version>${spring.version}</version>
-      <!-- force library users to decide on their version of Spring -->
-      <!-- we only use one interface (org.springframework.jdbc.core.namedparam.SqlParameterSource) -->
-      <!-- and the Resource abstraction in this library -->
-      <scope>provided</scope>
+      <!-- Spring is an optional dependency -->
+      <!-- Only SpringSqlParams and ElSqlBundle depend on it -->
+      <optional>true</optional>
     </dependency>
 
     <dependency>

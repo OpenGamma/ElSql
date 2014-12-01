@@ -7,25 +7,25 @@ package com.opengamma.elsql;
 
 import static org.testng.AssertJUnit.assertEquals;
 
-import org.springframework.core.io.Resource;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import java.net.URL;
+
 import org.testng.annotations.Test;
 
 /**
  * Test.
  */
 @Test
-public class ElSqlBundleTest {
+public class ElSqlTest {
 
   public void test_of_noOverride() {
-    ElSqlBundle test = ElSqlBundle.of(ElSqlConfig.DEFAULT, ElSql.class);
+    ElSql test = ElSql.of(ElSqlConfig.DEFAULT, ElSql.class);
     assertEquals(ElSqlConfig.DEFAULT, test.getConfig());
     assertEquals("SELECT * FROM foo ", test.getSql("TestFoo"));
     assertEquals("SELECT * FROM bar ", test.getSql("TestBar"));
   }
 
   public void test_of_noOverride_withConfig() {
-    ElSqlBundle test = ElSqlBundle.of(ElSqlConfig.DEFAULT, ElSql.class);
+    ElSql test = ElSql.of(ElSqlConfig.DEFAULT, ElSql.class);
     assertEquals(ElSqlConfig.DEFAULT, test.getConfig());
     test.withConfig(ElSqlConfig.HSQL);  // resources not reloaded
     assertEquals("SELECT * FROM foo ", test.getSql("TestFoo"));
@@ -33,37 +33,37 @@ public class ElSqlBundleTest {
   }
 
   public void test_of_dbOverride() {
-    ElSqlBundle test = ElSqlBundle.of(ElSqlConfig.HSQL, ElSql.class);
+    ElSql test = ElSql.of(ElSqlConfig.HSQL, ElSql.class);
     assertEquals("SELECT * FROM foo ", test.getSql("TestFoo"));
     assertEquals("SELECT * FROM bar, foo ", test.getSql("TestBar"));
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void test_of_nullConfig() {
-    ElSqlBundle.of(null, ElSqlBundle.class);
+    ElSql.of(null, ElSql.class);
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void test_of_nullClass() {
-    ElSqlBundle.of(ElSqlConfig.DEFAULT, null);
+    ElSql.of(ElSqlConfig.DEFAULT, null);
   }
 
   //-------------------------------------------------------------------------
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void test_parse_nullConfig() {
-    ElSqlBundle.parse(null, new Resource[0]);
+    ElSql.parse(null, new URL[0]);
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void test_parse_nullClass() {
-    ElSqlBundle.parse(ElSqlConfig.DEFAULT, (Resource[]) null);
+    ElSql.parse(ElSqlConfig.DEFAULT, (URL[]) null);
   }
 
   //-------------------------------------------------------------------------
   public void test_getSql() {
-    ElSqlBundle test = ElSqlBundle.of(ElSqlConfig.DEFAULT, ElSql.class);
+    ElSql test = ElSql.of(ElSqlConfig.DEFAULT, ElSql.class);
     assertEquals("SELECT * FROM foo ", test.getSql("TestFoo"));
-    assertEquals("SELECT * FROM foo ", test.getSql("TestFoo", new MapSqlParameterSource()));
+    assertEquals("SELECT * FROM foo ", test.getSql("TestFoo", EmptySqlParams.INSTANCE));
   }
 
 }

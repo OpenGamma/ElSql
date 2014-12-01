@@ -5,8 +5,6 @@
  */
 package com.opengamma.elsql;
 
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-
 /**
  * Representation of INCLUDE(key).
  * <p>
@@ -33,13 +31,13 @@ final class IncludeSqlFragment extends SqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
     String key = _includeKey;
-    if (key.startsWith(":")) {
-      key = paramSource.getValue(_includeKey.substring(1)).toString();
+    if (key.startsWith(":") && params.contains(_includeKey.substring(1))) {
+      key = params.get(_includeKey.substring(1)).toString();
     }
-    NameSqlFragment unit = bundle.getFragment(key);
-    unit.toSQL(buf, bundle, paramSource, loopIndex);
+    NameSqlFragment unit = fragments.getFragment(key);
+    unit.toSQL(buf, fragments, params, loopIndex);
   }
 
   //-------------------------------------------------------------------------

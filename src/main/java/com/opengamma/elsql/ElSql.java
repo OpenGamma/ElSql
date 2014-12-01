@@ -5,28 +5,22 @@
  */
 package com.opengamma.elsql;
 
-import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import java.util.Map;
 
 /**
- * Entry point integrated with the Spring framework, providing access to a bundle of elsql formatted SQL.
+ * Main entry point, providing access to a bundle of elsql formatted SQL.
  * <p>
  * The bundle encapsulates the SQL needed for a particular feature.
  * This will typically correspond to a data access object, or set of related tables.
  * <p>
- * This class uses features from the Spring framework.
- * The same functionality is available from the {@link ElSql} class, which does
- * not depend on Spring.
+ * This class has no dependencies on any external libraries.
+ * Similar functionality is available from the {@link ElSqlBundle} class,
+ * which provides integration with the Spring framework.
  * <p>
  * This class is immutable and thread-safe.
  */
-public final class ElSqlBundle {
+public final class ElSql {
 
   /**
    * The fragments.
@@ -54,57 +48,45 @@ public final class ElSqlBundle {
    * @return the bundle, not null
    * @throws IllegalArgumentException if the input cannot be parsed
    */
-  public static ElSqlBundle of(ElSqlConfig config, Class<?> type) {
+  public static ElSql of(ElSqlConfig config, Class<?> type) {
     if (config == null) {
       throw new IllegalArgumentException("Config must not be null");
     }
     if (type == null) {
       throw new IllegalArgumentException("Type must not be null");
     }
-    ClassPathResource baseResource = new ClassPathResource(type.getSimpleName() + ".elsql", type);
-    ClassPathResource configResource = new ClassPathResource(type.getSimpleName() + "-" + config.getName() + ".elsql", type);
+    URL baseResource = type.getResource(type.getSimpleName() + ".elsql");
+    URL configResource = type.getResource(type.getSimpleName() + "-" + config.getName() + ".elsql");
     return parse(config, baseResource, configResource);
   }
 
   /**
    * Parses a bundle from a resource locating a file, specify the config.
    * <p>
-   * This parses a list of resources. Named blocks in later resources override
-   * blocks with the same name in earlier resources.
+   * This parses a list of resources, expressed as {@code URL}s.
+   * Named blocks in later resources override blocks with the same name in earlier resources.
    * <p>
    * The config is designed to handle some, but not all, database differences.
    * Other differences are handled via the override resources passed in.
+   * <p>
+   * Each resource is a {@link URL}. A null URL is permitted and ignored.
+   * This allows classpath resources, obtained from {@link Class#getResource(String)}
+   * or {@link ClassLoader#getResource(String)} to be called and passed in directly
+   * as those methods return null when the target does not exist.
    * 
    * @param config  the config to use, not null
-   * @param resources  the resources to load, not null
+   * @param resources  the resources to load, not null, may contain nulls which are ignored
    * @return the external identifier, not null
    * @throws IllegalArgumentException if the input cannot be parsed
    */
-  public static ElSqlBundle parse(ElSqlConfig config, Resource... resources) {
+  public static ElSql parse(ElSqlConfig config, URL... resources) {
     if (config == null) {
       throw new IllegalArgumentException("Config must not be null");
     }
     if (resources == null) {
       throw new IllegalArgumentException("Resources must not be null");
     }
-    return parseResource(resources, config);
-  }
-
-  private static ElSqlBundle parseResource(Resource[] resources, ElSqlConfig config) {
-    List<List<String>> files = new ArrayList<List<String>>();
-    for (Resource resource : resources) {
-      if (resource.exists()) {
-        URL url;
-        try {
-          url = resource.getURL();
-        } catch (IOException ex) {
-          throw new RuntimeException(ex);
-        }
-        List<String> lines = SqlFragments.loadResource(url);
-        files.add(lines);
-      }
-    }
-    return new ElSqlBundle(SqlFragments.parse(files, config));
+    return new ElSql(SqlFragments.parseResource(resources, config));
   }
 
   //-------------------------------------------------------------------------
@@ -113,7 +95,7 @@ public final class ElSqlBundle {
    * 
    * @param fragments  the fragments to use, not null
    */
-  private ElSqlBundle(SqlFragments fragments) {
+  private ElSql(SqlFragments fragments) {
     if (fragments == null) {
       throw new IllegalArgumentException("Fragment map must not be null");
     }
@@ -138,8 +120,8 @@ public final class ElSqlBundle {
    * @param config  the new config, not null
    * @return a bundle with the config updated, not null
    */
-  public ElSqlBundle withConfig(ElSqlConfig config) {
-    return new ElSqlBundle(_fragments.withConfig(config));
+  public ElSql withConfig(ElSqlConfig config) {
+    return new ElSql(_fragments.withConfig(config));
   }
 
   //-------------------------------------------------------------------------
@@ -163,15 +145,34 @@ public final class ElSqlBundle {
    * Finds SQL for a named fragment key.
    * <p>
    * This finds, processes and returns a named block from the bundle.
+   * <p>
+   * See {@link MapSqlParams} and {@link SpringSqlParams}.
    * 
    * @param name  the name, not null
-   * @param paramSource  the Spring SQL parameters, not null
+   * @param params  the SQL parameters, not null
    * @return the SQL, not null
    * @throws IllegalArgumentException if there is no fragment with the specified name
    * @throws RuntimeException if a problem occurs
    */
-  public String getSql(String name, SqlParameterSource paramSource) {
-    return _fragments.getSql(name, new SpringSqlParams(paramSource));
+  public String getSql(String name, SqlParams params) {
+    return _fragments.getSql(name, params);
+  }
+
+  /**
+   * Finds SQL for a named fragment key.
+   * <p>
+   * This finds, processes and returns a named block from the bundle.
+   * <p>
+   * See {@link MapSqlParams} and {@link SpringSqlParams}.
+   * 
+   * @param name  the name, not null
+   * @param params  the SQL parameters, not null
+   * @return the SQL, not null
+   * @throws IllegalArgumentException if there is no fragment with the specified name
+   * @throws RuntimeException if a problem occurs
+   */
+  public String getSql(String name, Map<String, Object> params) {
+    return _fragments.getSql(name, new MapSqlParams(params));
   }
 
 }

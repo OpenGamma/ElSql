@@ -5,8 +5,6 @@
  */
 package com.opengamma.elsql;
 
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-
 /**
  * Simple fragment of textual SQL.
  * <p>
@@ -42,7 +40,7 @@ final class TextSqlFragment extends SqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
     String text = applyLoopIndex(_text, loopIndex);
     buf.append(text);
   }

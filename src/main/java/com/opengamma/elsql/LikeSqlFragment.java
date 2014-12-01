@@ -5,8 +5,6 @@
  */
 package com.opengamma.elsql;
 
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-
 /**
  * Representation of LIKE(variable).
  * <p>
@@ -25,20 +23,21 @@ final class LikeSqlFragment extends OperatorSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
     String var = applyLoopIndex(_variable, loopIndex);
-    Object val = paramSource.getValue(var);
+    Object val = params.get(var);
     if (val == null) {
       buf.append("IS NULL ");
     } else {
-      if (bundle.getConfig().isLikeWildcard(val.toString())) {
+      if (fragments.getConfig().isLikeWildcard(val.toString())) {
         buf.append("LIKE ");
-        super.toSQL(buf, bundle, paramSource, loopIndex);
-        buf.append(bundle.getConfig().getLikeSuffix());
+        super.toSQL(buf, fragments, params, loopIndex);
+        buf.append(fragments.getConfig().getLikeSuffix());
       } else {
         buf.append("= ");
-        super.toSQL(buf, bundle, paramSource, loopIndex);
+        super.toSQL(buf, fragments, params, loopIndex);
       }
     }
   }
+
 }

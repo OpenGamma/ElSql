@@ -5,8 +5,6 @@
  */
 package com.opengamma.elsql;
 
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-
 /**
  * Representation of conditional SQL fragment.
  */
@@ -58,12 +56,12 @@ abstract class ConditionalSqlFragment extends ContainerSqlFragment {
   }
 
   //-------------------------------------------------------------------------
-  protected boolean isMatch(SqlParameterSource paramSource, int loopIndex) {
+  boolean isMatch(SqlParams params, int loopIndex) {
     String var = applyLoopIndex(_variable, loopIndex);
-    if (paramSource.hasValue(var) == false) {
+    if (params.contains(var) == false) {
       return false;
     }
-    Object value = paramSource.getValue(var);
+    Object value = params.get(var);
     if (value == null) {
       return false;
     }
@@ -76,7 +74,7 @@ abstract class ConditionalSqlFragment extends ContainerSqlFragment {
     return true;
   }
 
-  protected boolean endsWith(StringBuilder buf, String match) {
+  boolean endsWith(StringBuilder buf, String match) {
     String str = (buf.length() >= match.length() ? buf.substring(buf.length() - match.length()) : "");
     return str.equals(match);
   }

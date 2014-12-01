@@ -18,7 +18,7 @@
  * <li>reading in an external file, such as a properties file
  * </ul>
  * This library focuses on the last of these, using an external file.
- * It is designed for use with Spring, and uses the Spring SqlParameterSource class.
+ * It is a standalone library with no dependencies.
  * <p>
  * The key benefit is a simple external file that a DBA can understand, something
  * which is invaluable for later maintenance and debugging.
@@ -41,7 +41,7 @@
  * <li>tags start with the @ symbol
  * <li>the primary blocks are &#064;NAME(name) - the name refers to the block
  * <li>indentation is used to create blocks - indented lines "belong" to the parent less-indented line
- * <li>variables start with a colon, as this is integrated with Spring
+ * <li>variables start with a colon
  * <li>the various tags aim to handle over 80% of your needs
  * </ul>
  * <p>

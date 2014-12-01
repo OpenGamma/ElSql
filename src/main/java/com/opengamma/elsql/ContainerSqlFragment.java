@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-
 /**
  * Representation of a list of child units.
  */
@@ -48,9 +46,9 @@ class ContainerSqlFragment extends SqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  protected void toSQL(StringBuilder buf, ElSqlBundle bundle, SqlParameterSource paramSource, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
     for (SqlFragment fragment : _fragments) {
-      fragment.toSQL(buf, bundle, paramSource, loopIndex);
+      fragment.toSQL(buf, fragments, params, loopIndex);
     }
   }
 
