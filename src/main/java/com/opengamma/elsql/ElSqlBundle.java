@@ -163,6 +163,8 @@ public final class ElSqlBundle {
    * Finds SQL for a named fragment key.
    * <p>
    * This finds, processes and returns a named block from the bundle.
+   * The parameters are used to provide intelligent processing of SQL based on
+   * the actual data in the request.
    * 
    * @param name  the name, not null
    * @param paramSource  the Spring SQL parameters, not null

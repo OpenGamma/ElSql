@@ -142,9 +142,11 @@ public final class ElSql {
   }
 
   /**
-   * Finds SQL for a named fragment key.
+   * Finds SQL for a named fragment key, providing the SQL parameters.
    * <p>
    * This finds, processes and returns a named block from the bundle.
+   * The parameters are used to provide intelligent processing of SQL based on
+   * the actual data in the request.
    * <p>
    * See {@link MapSqlParams} and {@link SpringSqlParams}.
    * 
@@ -159,11 +161,11 @@ public final class ElSql {
   }
 
   /**
-   * Finds SQL for a named fragment key.
+   * Finds SQL for a named fragment key, providing a map of SQL parameters.
    * <p>
    * This finds, processes and returns a named block from the bundle.
-   * <p>
-   * See {@link MapSqlParams} and {@link SpringSqlParams}.
+   * The parameters are used to provide intelligent processing of SQL based on
+   * the actual data in the request.
    * 
    * @param name  the name, not null
    * @param params  the SQL parameters, not null
