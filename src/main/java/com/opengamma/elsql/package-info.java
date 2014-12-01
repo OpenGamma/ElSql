@@ -110,5 +110,7 @@
  * <p>
  * &#064;FETCH(fetchVariable)<br>
  * The fetch tag adds the SQL FETCH clause. It works as per the offset-fetch tag.
+ * <p>
+ * To use the library, simply obtain an instance of {@code ElSql} and call {@code getSql()}.
  */
 package com.opengamma.elsql;

@@ -8,10 +8,10 @@
   <body>
 
     <!-- types are add, fix, remove, update -->
-    <release version="1.0" date="" description="v1.0">
+    <release version="1.0" date="2014-12-01" description="v1.0">
       <action dev="jodastephen" type="add">
         Make dependency on Spring framework optional.
-        Use ElSql class to avoid the dependency, use ELSqlBundle to use the dependency.
+        Use ElSql class to avoid the dependency, use ElSqlBundle to use the dependency.
         Fixes #11.
       </action>
       <action dev="jodastephen" type="fix">
