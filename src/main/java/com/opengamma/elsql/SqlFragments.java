@@ -139,6 +139,12 @@ final class SqlFragments {
    * @throws RuntimeException if a problem occurs
    */
   String getSql(String name, SqlParams params) {
+    if (name == null) {
+      throw new IllegalArgumentException("Fragment name must not be null");
+    }
+    if (params == null) {
+      throw new IllegalArgumentException("SqlParams must not be null");
+    }
     NameSqlFragment fragment = getFragment(name);
     StringBuilder buf = new StringBuilder(1024);
     fragment.toSQL(buf, this, params, -1);
@@ -153,6 +159,9 @@ final class SqlFragments {
    * @throws IllegalArgumentException if there is no fragment with the specified name
    */
   NameSqlFragment getFragment(String name) {
+    if (name == null) {
+      throw new IllegalArgumentException("Fragment name must not be null");
+    }
     NameSqlFragment fragment = _map.get(name);
     if (fragment == null) {
       throw new IllegalArgumentException("Unknown fragment name: " + name);
