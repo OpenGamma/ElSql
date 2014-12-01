@@ -5,7 +5,7 @@ title: ElSQl documentation
 ElSql documentation
 ===================
 
-[User guide](userguide.html)
+[User guide](https://github.com/OpenGamma/ElSql/wiki/User-guide)
 
 [Javadoc](apidocs/index.html)
 
