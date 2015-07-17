@@ -1,5 +1,9 @@
 ElSql
 =====
+
+[![Build Status](https://travis-ci.org/OpenGamma/ElSql.svg?branch=master)](https://travis-ci.org/OpenGamma/ElSql)
+[![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+
 Manage SQL external to a Java application.
 
 ElSql. Short for "External SQL".
