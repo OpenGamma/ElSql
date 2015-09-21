@@ -23,6 +23,11 @@ import java.util.Map;
 final class SqlFragments {
 
   /**
+   * An empty array.
+   */
+  private static final int[] NO_LOOP = new int[] {-1};
+
+  /**
    * The map of known elsql.
    */
   private final Map<String, NameSqlFragment> _map;
@@ -147,7 +152,7 @@ final class SqlFragments {
     }
     NameSqlFragment fragment = getFragment(name);
     StringBuilder buf = new StringBuilder(1024);
-    fragment.toSQL(buf, this, params, -1);
+    fragment.toSQL(buf, this, params, NO_LOOP);
     return buf.toString();
   }
 

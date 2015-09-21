@@ -31,7 +31,7 @@ final class IncludeSqlFragment extends SqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int[] loopIndex) {
     String key = _includeKey;
     if (key.startsWith(":") && params.contains(_includeKey.substring(1))) {
       key = params.get(_includeKey.substring(1)).toString();

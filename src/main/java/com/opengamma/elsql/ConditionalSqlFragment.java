@@ -56,7 +56,7 @@ abstract class ConditionalSqlFragment extends ContainerSqlFragment {
   }
 
   //-------------------------------------------------------------------------
-  boolean isMatch(SqlParams params, int loopIndex) {
+  boolean isMatch(SqlParams params, int[] loopIndex) {
     String var = applyLoopIndex(_variable, loopIndex);
     if (params.contains(var) == false) {
       return false;

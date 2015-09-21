@@ -44,7 +44,7 @@ final class OffsetFetchSqlFragment extends ContainerSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int[] loopIndex) {
     int offset = 0;
     int fetchLimit = 0;
     if (_offsetVariable != null && params.contains(_offsetVariable)) {

@@ -30,15 +30,15 @@ final class ElSqlParser {
   /**
    * The regex for @AND(identifier).
    */
-  private static final Pattern AND_PATTERN = Pattern.compile("[ ]*[@]AND[(]([:][A-Za-z0-9_]+(?:@LOOPINDEX)?)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
+  private static final Pattern AND_PATTERN = Pattern.compile("[ ]*[@]AND[(]([:][A-Za-z0-9_]+(?:@LOOPINDEX[123]?)?)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
   /**
    * The regex for @OR(identifier).
    */
-  private static final Pattern OR_PATTERN = Pattern.compile("[ ]*[@]OR[(]([:][A-Za-z0-9_]+(?:@LOOPINDEX)?)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
+  private static final Pattern OR_PATTERN = Pattern.compile("[ ]*[@]OR[(]([:][A-Za-z0-9_]+(?:@LOOPINDEX[123]?)?)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
   /**
    * The regex for @IF(identifier).
    */
-  private static final Pattern IF_PATTERN = Pattern.compile("[ ]*[@]IF[(]([:][A-Za-z0-9_]+(?:@LOOPINDEX)?)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
+  private static final Pattern IF_PATTERN = Pattern.compile("[ ]*[@]IF[(]([:][A-Za-z0-9_]+(?:@LOOPINDEX[123]?)?)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
   /**
    * The regex for @LOOP(variable)
    */
@@ -66,11 +66,11 @@ final class ElSqlParser {
   /**
    * The regex for @VALUE(variable)
    */
-  private static final Pattern VALUE_PATTERN = Pattern.compile("[@]VALUE[(][:]([A-Za-z0-9_]+(?:@LOOPINDEX)?)[)]( )*(.*)");
+  private static final Pattern VALUE_PATTERN = Pattern.compile("[@]VALUE[(][:]([A-Za-z0-9_]+(?:@LOOPINDEX[123]?)?)[)]( )*(.*)");
   /**
    * The regex for @LIKE and @EQUALS :variable
    */
-  private static final Pattern OPERATOR_VARIABLE_PATTERN = Pattern.compile("([^:])*([:][A-Za-z0-9_]+(?:@LOOPINDEX)?)(.*)");
+  private static final Pattern OPERATOR_VARIABLE_PATTERN = Pattern.compile("([^:])*([:][A-Za-z0-9_]+(?:@LOOPINDEX[123]?)?)(.*)");
   /**
 
   /**

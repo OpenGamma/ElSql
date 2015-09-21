@@ -25,7 +25,7 @@ final class AndSqlFragment extends ConditionalSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int[] loopIndex) {
     if (isMatch(params, loopIndex)) {
       if (endsWith(buf, " WHERE ") == false && endsWith(buf, " AND ") == false) {
         buf.append("AND ");

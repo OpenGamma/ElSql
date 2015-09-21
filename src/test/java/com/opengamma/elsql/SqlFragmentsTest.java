@@ -1097,7 +1097,7 @@ public class SqlFragmentsTest {
         "@NAME(Test1)",
         "  SELECT * FROM foo WHERE",
         "  @LOOP(:size)",
-        "    (a = :a@LOOPINDEX AND b = :b@LOOPINDEX)",
+        "    (a = :a@LOOPINDEX1 AND b = :b@LOOPINDEX)",
         "    @LOOPJOIN OR"
     );
     SqlFragments bundle = SqlFragments.parse(lines);
@@ -1143,7 +1143,7 @@ public class SqlFragmentsTest {
         "@NAME(Test1)",
         "  SELECT * FROM foo WHERE",
         "  @LOOP(:size)",
-        "    (a = :a@LOOPINDEX AND b @LIKE :b@LOOPINDEX@ENDLIKE)",
+        "    (a = :a@LOOPINDEX AND b @LIKE :b@LOOPINDEX1@ENDLIKE)",
         "    @LOOPJOIN OR"
     );
     SqlFragments bundle = SqlFragments.parse(lines);
@@ -1175,7 +1175,7 @@ public class SqlFragmentsTest {
         "@NAME(Test1)",
         "  SELECT * FROM foo WHERE",
         "  @LOOP(:size)",
-        "    (a = :a@LOOPINDEX AND b = @VALUE(:b@LOOPINDEX))",
+        "    (a = :a@LOOPINDEX AND b = @VALUE(:b@LOOPINDEX1))",
         "    @LOOPJOIN OR"
     );
     SqlFragments bundle = SqlFragments.parse(lines);
@@ -1199,6 +1199,26 @@ public class SqlFragmentsTest {
     SqlParams params = new MapSqlParams("size", new Date())
       .with("a0", "name").with("b0", "bob");
     bundle.getSql("Test1", params);
+  }
+
+  public void test_loopInLoopWithJoin() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo WHERE",
+        "  @LOOP(:size1)",
+        "    @LOOP(:size2)",
+        "      (a = :a@LOOPINDEX1 AND b = :b@LOOPINDEX2)",
+        "      @LOOPJOIN OR",
+        "    @LOOPJOIN AND"
+    );
+    SqlFragments bundle = SqlFragments.parse(lines);
+    SqlParams params = new MapSqlParams("size1", 2)
+      .with("size2", "2")
+      .with("a0", "name").with("b0", "bob")
+      .with("b0", "type").with("b1", "doctor");
+    String sql1 = bundle.getSql("Test1", params);
+    assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = :b0) OR (a = :a0 AND b = :b1) " +
+        "AND (a = :a1 AND b = :b0) OR (a = :a1 AND b = :b1) ", sql1);
   }
 
 }

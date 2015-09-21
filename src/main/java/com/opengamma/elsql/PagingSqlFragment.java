@@ -32,7 +32,7 @@ final class PagingSqlFragment extends ContainerSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int[] loopIndex) {
     int oldLen = buf.length();
     super.toSQL(buf, fragments, params, loopIndex);
     int newLen = buf.length();

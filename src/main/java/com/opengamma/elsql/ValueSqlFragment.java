@@ -37,7 +37,7 @@ final class ValueSqlFragment extends SqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int[] loopIndex) {
     String var = applyLoopIndex(_valueVariable, loopIndex);
     Object value = params.get(var);
     if (value != null) {

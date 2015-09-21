@@ -46,7 +46,7 @@ class ContainerSqlFragment extends SqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int[] loopIndex) {
     for (SqlFragment fragment : _fragments) {
       fragment.toSQL(buf, fragments, params, loopIndex);
     }

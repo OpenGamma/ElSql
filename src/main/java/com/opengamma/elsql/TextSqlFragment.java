@@ -40,7 +40,8 @@ final class TextSqlFragment extends SqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int[] loopIndex) {
+    // handle LOOPINDEX, which is a text-like tag not surrounded by whitespace
     String text = applyLoopIndex(_text, loopIndex);
     buf.append(text);
   }

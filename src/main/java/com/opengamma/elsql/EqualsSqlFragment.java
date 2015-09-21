@@ -23,7 +23,7 @@ final class EqualsSqlFragment extends OperatorSqlFragment {
 
   // -------------------------------------------------------------------------
   @Override
-  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int[] loopIndex) {
     String var = applyLoopIndex(_variable, loopIndex);
     Object val = params.get(var);
     if (val == null) {

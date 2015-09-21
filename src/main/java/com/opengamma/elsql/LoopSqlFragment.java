@@ -5,6 +5,8 @@
  */
 package com.opengamma.elsql;
 
+import java.util.Arrays;
+
 /**
  * Representation of WHERE.
  * <p>
@@ -28,7 +30,7 @@ final class LoopSqlFragment extends ContainerSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int[] loopIndex) {
     // find loop size
     Object sizeObj = params.get(_sizeVariable);
     int size;
@@ -40,10 +42,11 @@ final class LoopSqlFragment extends ContainerSqlFragment {
       throw new IllegalArgumentException("Loop size variable must be Number or String: " + _sizeVariable);
     }
     // loop
+    int[] childLoopIndex = Arrays.copyOf(loopIndex, loopIndex.length + 1);
     for (int i = 0; i < size; i++) {
-      // index
       StringBuilder part = new StringBuilder();
-      super.toSQL(part, fragments, params, i);
+      childLoopIndex[childLoopIndex.length - 1] = i;
+      super.toSQL(part, fragments, params, childLoopIndex);
       int joinIndex = part.indexOf("@LOOPJOIN ");
       if (joinIndex >= 0) {
         if (i >= (size - 1)) {

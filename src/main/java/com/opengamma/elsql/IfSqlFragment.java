@@ -24,7 +24,7 @@ final class IfSqlFragment extends ConditionalSqlFragment {
 
   //-------------------------------------------------------------------------
   @Override
-  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int loopIndex) {
+  void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int[] loopIndex) {
     if (isMatch(params, loopIndex)) {
       super.toSQL(buf, fragments, params, loopIndex);
     }
