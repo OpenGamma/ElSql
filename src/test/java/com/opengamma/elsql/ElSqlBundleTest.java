@@ -7,6 +7,7 @@ package com.opengamma.elsql;
 
 import static org.testng.AssertJUnit.assertEquals;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.testng.annotations.Test;
@@ -57,6 +58,12 @@ public class ElSqlBundleTest {
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void test_parse_nullClass() {
     ElSqlBundle.parse(ElSqlConfig.DEFAULT, (Resource[]) null);
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_parse_noExistingResource() {
+    Resource resource = new ClassPathResource("NAME_OF_NON_EXISTING_RESOURCE.elsql");
+    ElSqlBundle.parse(ElSqlConfig.DEFAULT, resource);
   }
 
   //-------------------------------------------------------------------------

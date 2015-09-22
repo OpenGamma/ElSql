@@ -38,13 +38,19 @@ final class SqlFragments {
 
   //-------------------------------------------------------------------------
   // parse a set of resources, where names in later resources override names in earlier ones
+  // throws an IllegalArgumentException when none of the resources exists
   static SqlFragments parseResource(URL[] resources, ElSqlConfig config) {
     List<List<String>> files = new ArrayList<List<String>>();
+    boolean resourceFound = false;
     for (URL resource : resources) {
       if (resource != null) {
+        resourceFound = true;
         List<String> lines = loadResource(resource);
         files.add(lines);
       }
+    }
+    if (!resourceFound) {
+      throw new IllegalArgumentException("No matching resource was found");
     }
     return parse(files, config);
   }

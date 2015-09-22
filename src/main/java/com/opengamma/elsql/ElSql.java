@@ -46,7 +46,7 @@ public final class ElSql {
    * @param config  the config, not null
    * @param type  the type, not null
    * @return the bundle, not null
-   * @throws IllegalArgumentException if the input cannot be parsed
+   * @throws IllegalArgumentException if the input cannot be parsed or if no matching resource exists
    */
   public static ElSql of(ElSqlConfig config, Class<?> type) {
     if (config == null) {
@@ -77,7 +77,7 @@ public final class ElSql {
    * @param config  the config to use, not null
    * @param resources  the resources to load, not null, may contain nulls which are ignored
    * @return the external identifier, not null
-   * @throws IllegalArgumentException if the input cannot be parsed
+   * @throws IllegalArgumentException if the input cannot be parsed or if none of the resources exists
    */
   public static ElSql parse(ElSqlConfig config, URL... resources) {
     if (config == null) {

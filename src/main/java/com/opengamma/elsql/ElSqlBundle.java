@@ -78,7 +78,7 @@ public final class ElSqlBundle {
    * @param config  the config to use, not null
    * @param resources  the resources to load, not null
    * @return the external identifier, not null
-   * @throws IllegalArgumentException if the input cannot be parsed
+   * @throws IllegalArgumentException if the input cannot be parsed or if none of the resources exists
    */
   public static ElSqlBundle parse(ElSqlConfig config, Resource... resources) {
     if (config == null) {
@@ -92,8 +92,10 @@ public final class ElSqlBundle {
 
   private static ElSqlBundle parseResource(Resource[] resources, ElSqlConfig config) {
     List<List<String>> files = new ArrayList<List<String>>();
+    boolean resourceFound = false;
     for (Resource resource : resources) {
       if (resource.exists()) {
+        resourceFound = true;
         URL url;
         try {
           url = resource.getURL();
@@ -103,6 +105,9 @@ public final class ElSqlBundle {
         List<String> lines = SqlFragments.loadResource(url);
         files.add(lines);
       }
+    }
+    if (!resourceFound) {
+      throw new IllegalArgumentException("No matching resource was found");
     }
     return new ElSqlBundle(SqlFragments.parse(files, config));
   }
