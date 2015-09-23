@@ -36,7 +36,12 @@
       <organizationUrl>http://developers.opengamma.com</organizationUrl>
     </developer>
   </developers>
+  <!-- Alphabetical list -->
   <contributors>
+    <contributor>
+      <name>Mark Janssen</name>
+      <url>https://github.com/praseodym</url>
+    </contributor>
     <contributor>
       <name>Andrew May</name>
       <url>https://github.com/andrewdmay</url>
@@ -44,6 +49,10 @@
     <contributor>
       <name>ati-ozgur</name>
       <url>https://github.com/ati-ozgur</url>
+    </contributor>
+    <contributor>
+      <name>Erik van Paassen</name>
+      <url>https://github.com/evpaassen</url>
     </contributor>
   </contributors>
 
