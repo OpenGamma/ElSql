@@ -59,6 +59,12 @@ public class ElSqlTest {
     ElSql.parse(ElSqlConfig.DEFAULT, (URL[]) null);
   }
 
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void test_parse_noExistingResource() {
+    URL[] resources = new URL[] { getClass().getResource("NAME_OF_NON_EXISTING_RESOURCE.elsql") };
+    ElSql.parse(ElSqlConfig.DEFAULT, resources);
+  }
+
   //-------------------------------------------------------------------------
   public void test_getSql() {
     ElSql test = ElSql.of(ElSqlConfig.DEFAULT, ElSql.class);
