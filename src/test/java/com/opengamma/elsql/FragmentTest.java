@@ -114,7 +114,7 @@ public class FragmentTest {
 
   //-------------------------------------------------------------------------
   public void test_OffsetFetchSqlFragment() {
-    OffsetFetchSqlFragment test = new OffsetFetchSqlFragment("test");
+    OffsetFetchSqlFragment test = new OffsetFetchSqlFragment(":test");
     assertEquals("OffsetFetchSqlFragment []", test.toString());
   }
 

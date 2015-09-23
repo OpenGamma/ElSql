@@ -410,6 +410,17 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo OFFSET 7 ROWS FETCH NEXT 3 ROWS ONLY ENDFOO ", sql1);
   }
 
+  public void test_offsetFetch_specifiedLiterals() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  @OFFSETFETCH(8, 4) ENDFOO"
+    );
+    SqlFragments bundle = SqlFragments.parse(lines);
+    String sql1 = bundle.getSql("Test1", EmptySqlParams.INSTANCE);
+    assertEquals("SELECT * FROM foo OFFSET 8 ROWS FETCH NEXT 4 ROWS ONLY ENDFOO ", sql1);
+  }
+
   //-------------------------------------------------------------------------
   public void test_paging_specifiedVars() {
     List<String> lines = Arrays.asList(

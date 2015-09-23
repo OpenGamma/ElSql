@@ -54,15 +54,11 @@ final class ElSqlParser {
   /**
    * The regex for @OFFSETFETCH(offsetVariable,fetchVariable)
    */
-  private static final Pattern OFFSET_FETCH_PATTERN = Pattern.compile("[@]OFFSETFETCH[(][:]([A-Za-z0-9_]+)[ ]?[,][ ]?[:]([A-Za-z0-9_]+)[)](.*)");
+  private static final Pattern OFFSET_FETCH_PATTERN = Pattern.compile("[@]OFFSETFETCH[(]([0-9]+|[:][A-Za-z0-9_]+)[ ]?[,][ ]?([0-9]+|[:][A-Za-z0-9_]+)[)](.*)");
   /**
    * The regex for @FETCH(fetchVariable)
    */
-  private static final Pattern FETCH_PATTERN = Pattern.compile("[@]FETCH[(][:]([A-Za-z0-9_]+)[)](.*)");
-  /**
-   * The regex for @FETCH(numberRows)
-   */
-  private static final Pattern FETCH_ROWS_PATTERN = Pattern.compile("[@]FETCH[(]([0-9]+)[)](.*)");
+  private static final Pattern FETCH_PATTERN = Pattern.compile("[@]FETCH[(]([0-9]+|[:][A-Za-z0-9_]+)[)](.*)");
   /**
    * The regex for @VALUE(variable)
    */
@@ -384,8 +380,8 @@ final class ElSqlParser {
     parseLine(container, split[0]);
     String trimmed = split[1].lineTrimmed();
     
-    String offsetVariable = "paging_offset";
-    String fetchVariable = "paging_fetch";
+    String offsetVariable = ":paging_offset";
+    String fetchVariable = ":paging_fetch";
     int remainderIndex = 12;
     if (trimmed.startsWith("@OFFSETFETCH(")) {
       Matcher matcher = OFFSET_FETCH_PATTERN.matcher(trimmed);
@@ -418,17 +414,13 @@ final class ElSqlParser {
     parseLine(container, split[0]);
     String trimmed = split[1].lineTrimmed();
     
-    String fetchVariable = "paging_fetch";
+    String fetchVariable = ":paging_fetch";
     int remainderIndex = 6;
     if (trimmed.startsWith("@FETCH(")) {
       Matcher matcherVariable = FETCH_PATTERN.matcher(trimmed);
-      Matcher matcherRows = FETCH_ROWS_PATTERN.matcher(trimmed);
       if (matcherVariable.matches()) {
         fetchVariable = matcherVariable.group(1);
         remainderIndex = matcherVariable.start(2);
-      } else if (matcherRows.matches()) {
-        fetchVariable = matcherRows.group(1);
-        remainderIndex = matcherRows.start(2);
       } else {
         throw new IllegalArgumentException("@FETCH found with invalid format: " + line);
       }
