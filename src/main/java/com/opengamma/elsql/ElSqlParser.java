@@ -50,7 +50,7 @@ final class ElSqlParser {
   /**
    * The regex for @PAGING(offsetVariable,fetchVariable)
    */
-  private static final Pattern PAGING_PATTERN = Pattern.compile("[@]PAGING[(][:]([A-Za-z0-9_]+)[ ]?[,][ ]?[:]([A-Za-z0-9_]+)[)](.*)");
+  private static final Pattern PAGING_PATTERN = Pattern.compile("[@]PAGING[(]([0-9]+|[:][A-Za-z0-9_]+)[ ]?[,][ ]?([0-9]+|[:][A-Za-z0-9_]+)[)](.*)");
   /**
    * The regex for @OFFSETFETCH(offsetVariable,fetchVariable)
    */

@@ -120,7 +120,7 @@ public class FragmentTest {
 
   //-------------------------------------------------------------------------
   public void test_PagingSqlFragment() {
-    PagingSqlFragment test = new PagingSqlFragment("test", "bar");
+    PagingSqlFragment test = new PagingSqlFragment(":test", ":bar");
     assertEquals("PagingSqlFragment []", test.toString());
   }
 

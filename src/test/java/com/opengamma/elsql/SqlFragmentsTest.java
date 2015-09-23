@@ -423,6 +423,17 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo ORDER BY bar OFFSET 7 ROWS FETCH NEXT 3 ROWS ONLY ", sql1);
   }
 
+  public void test_paging_specifiedLiterals() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  @PAGING(8, 4)",
+        "    SELECT * FROM foo ORDER BY bar "
+    );
+    SqlFragments bundle = SqlFragments.parse(lines);
+    String sql1 = bundle.getSql("Test1", EmptySqlParams.INSTANCE);
+    assertEquals("SELECT * FROM foo ORDER BY bar OFFSET 8 ROWS FETCH NEXT 4 ROWS ONLY ", sql1);
+  }
+
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void test_paging_invalidFormat1() {
     List<String> lines = Arrays.asList(
