@@ -45,24 +45,8 @@ final class OffsetFetchSqlFragment extends ContainerSqlFragment {
   //-------------------------------------------------------------------------
   @Override
   void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int[] loopIndex) {
-    int offset = 0;
-    int fetchLimit = 0;
-    if (_offsetVariable != null && _offsetVariable.startsWith(":") && _offsetVariable.length() > 1) {
-      String offsetVariableName = _offsetVariable.substring(1);
-      if (params.contains(offsetVariableName)) {
-        offset = ((Number) params.get(offsetVariableName)).intValue();
-      }
-    } else if (_offsetVariable != null && _offsetVariable.matches("[0-9]+")) {
-      offset = Integer.parseInt(_offsetVariable);
-    }
-    if (_fetchVariable.startsWith(":") && _fetchVariable.length() > 1) {
-      String fetchVariableName = _fetchVariable.substring(1);
-      if (params.contains(fetchVariableName)) {
-        fetchLimit = ((Number) params.get(fetchVariableName)).intValue();
-      }
-    } else if (_fetchVariable.matches("[0-9]+")) {
-      fetchLimit = Integer.parseInt(_fetchVariable);
-    }
+    int offset = extractVariableOrLiteral(params, _offsetVariable);
+    int fetchLimit = extractVariableOrLiteral(params, _fetchVariable);
     buf.append(fragments.getConfig().getPaging(offset, fetchLimit == Integer.MAX_VALUE ? 0 : fetchLimit));
   }
 

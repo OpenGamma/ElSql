@@ -43,4 +43,25 @@ abstract class SqlFragment {
     return result;
   }
 
+  /**
+   * Given a variable or literal string, extract the value.
+   * 
+   * @param params  the SQL parameters
+   * @param str  the value to parse
+   * @return the integer value
+   */
+  static int extractVariableOrLiteral(SqlParams params, String str) {
+    if (str != null) {
+      if (str.startsWith(":") && str.length() > 1) {
+        String fetchVariableName = str.substring(1);
+        if (params.contains(fetchVariableName)) {
+          return ((Number) params.get(fetchVariableName)).intValue();
+        }
+      } else if (str.matches("[0-9]+")) {
+        return Integer.parseInt(str);
+      }
+    }
+    return 0;
+  }
+
 }
