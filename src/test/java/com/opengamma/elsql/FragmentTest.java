@@ -114,13 +114,13 @@ public class FragmentTest {
 
   //-------------------------------------------------------------------------
   public void test_OffsetFetchSqlFragment() {
-    OffsetFetchSqlFragment test = new OffsetFetchSqlFragment("test");
+    OffsetFetchSqlFragment test = new OffsetFetchSqlFragment(":test");
     assertEquals("OffsetFetchSqlFragment []", test.toString());
   }
 
   //-------------------------------------------------------------------------
   public void test_PagingSqlFragment() {
-    PagingSqlFragment test = new PagingSqlFragment("test", "bar");
+    PagingSqlFragment test = new PagingSqlFragment(":test", ":bar");
     assertEquals("PagingSqlFragment []", test.toString());
   }
 

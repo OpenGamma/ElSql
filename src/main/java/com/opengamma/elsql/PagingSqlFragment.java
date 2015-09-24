@@ -11,19 +11,19 @@ package com.opengamma.elsql;
 final class PagingSqlFragment extends ContainerSqlFragment {
 
   /**
-   * The offset variable.
+   * The offset variable name (starting with a colon) or numeric literal.
    */
   private final String _offsetVariable;
   /**
-   * The fetch variable or numeric amount.
+   * The fetch limit variable name (starting with a colon) or numeric literal.
    */
   private final String _fetchVariable;
 
   /**
    * Creates an instance.
    * 
-   * @param offsetVariable  the offset variable, not null
-   * @param fetchVariable  the fetch variable, not null
+   * @param offsetVariable  the offset variable name (starting with a colon) or numeric literal, not null
+   * @param fetchVariable  the fetch limit variable name (starting with a colon) or numeric literal, not null
    */
   PagingSqlFragment(String offsetVariable, String fetchVariable) {
     _offsetVariable = offsetVariable;
@@ -53,11 +53,19 @@ final class PagingSqlFragment extends ContainerSqlFragment {
   String applyPaging(String selectToPage, SqlFragments fragments, SqlParams params) {
     int offset = 0;
     int fetchLimit = 0;
-    if (_offsetVariable != null && params.contains(_offsetVariable)) {
-      offset = ((Number) params.get(_offsetVariable)).intValue();
+    if (_offsetVariable.startsWith(":") && _offsetVariable.length() > 1) {
+      String offsetVariableName = _offsetVariable.substring(1);
+      if (params.contains(offsetVariableName)) {
+        offset = ((Number) params.get(offsetVariableName)).intValue();
+      }
+    } else if (_offsetVariable.matches("[0-9]+")) {
+      offset = Integer.parseInt(_offsetVariable);
     }
-    if (params.contains(_fetchVariable)) {
-      fetchLimit = ((Number) params.get(_fetchVariable)).intValue();
+    if (_fetchVariable.startsWith(":") && _fetchVariable.length() > 1) {
+      String fetchVariableName = _fetchVariable.substring(1);
+      if (params.contains(fetchVariableName)) {
+        fetchLimit = ((Number) params.get(fetchVariableName)).intValue();
+      }
     } else if (_fetchVariable.matches("[0-9]+")) {
       fetchLimit = Integer.parseInt(_fetchVariable);
     }

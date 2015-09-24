@@ -410,6 +410,17 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo OFFSET 7 ROWS FETCH NEXT 3 ROWS ONLY ENDFOO ", sql1);
   }
 
+  public void test_offsetFetch_specifiedLiterals() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  @OFFSETFETCH(8, 4) ENDFOO"
+    );
+    SqlFragments bundle = SqlFragments.parse(lines);
+    String sql1 = bundle.getSql("Test1", EmptySqlParams.INSTANCE);
+    assertEquals("SELECT * FROM foo OFFSET 8 ROWS FETCH NEXT 4 ROWS ONLY ENDFOO ", sql1);
+  }
+
   //-------------------------------------------------------------------------
   public void test_paging_specifiedVars() {
     List<String> lines = Arrays.asList(
@@ -421,6 +432,17 @@ public class SqlFragmentsTest {
     SqlParams params = new MapSqlParams("offset", 7).with("fetch", 3);
     String sql1 = bundle.getSql("Test1", params);
     assertEquals("SELECT * FROM foo ORDER BY bar OFFSET 7 ROWS FETCH NEXT 3 ROWS ONLY ", sql1);
+  }
+
+  public void test_paging_specifiedLiterals() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  @PAGING(8, 4)",
+        "    SELECT * FROM foo ORDER BY bar "
+    );
+    SqlFragments bundle = SqlFragments.parse(lines);
+    String sql1 = bundle.getSql("Test1", EmptySqlParams.INSTANCE);
+    assertEquals("SELECT * FROM foo ORDER BY bar OFFSET 8 ROWS FETCH NEXT 4 ROWS ONLY ", sql1);
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
