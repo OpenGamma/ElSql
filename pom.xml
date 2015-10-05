@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.opengamma</groupId>
   <artifactId>elsql</artifactId>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
   <name>ElSql</name>
   <version>1.1.1-SNAPSHOT</version>
   <description>Simple tool to externalize SQL from Java</description>
@@ -100,6 +100,17 @@
               <packageName>com.opengamma</packageName>
             </manifest>
           </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>2.5.0</version>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Export-Package>com.opengamma.elsql</Export-Package>
+          </instructions>
         </configuration>
       </plugin>
       <plugin>
