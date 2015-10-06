@@ -24,49 +24,81 @@ import java.util.regex.Pattern;
 final class ElSqlParser {
 
   /**
+   * An identifier.
+   */
+  private static final String IDENTIFIER = "[A-Za-z0-9_]+";
+  /**
+   * A variable.
+   */
+  private static final String VARIABLE = "[:][A-Za-z0-9_]+";
+  /**
+   * A variable or literal number.
+   */
+  private static final String VARIABLE_OR_LITERAL = "[0-9]+|" + VARIABLE;
+  /**
+   * A variable with possible LOOPINDEX suffix.
+   */
+  private static final String VARIABLE_LOOPINDEX = "[:][A-Za-z0-9_]+(?:@LOOPINDEX[123]?)?";
+  /**
+   * Text to match in AND/OR/IF.
+   */
+  private static final String QUERY_TEXT = "[A-Za-z0-9_]+";
+
+  /**
    * The regex for @NAME(identifier).
    */
-  private static final Pattern NAME_PATTERN = Pattern.compile("[ ]*[@]NAME[(]([A-Za-z0-9_]+)[)][ ]*");
+  private static final Pattern NAME_PATTERN = Pattern.compile(
+      "[ ]*[@]NAME[(](" + IDENTIFIER + ")[)][ ]*");
   /**
-   * The regex for @AND(identifier).
+   * The regex for @AND(variable = query).
    */
-  private static final Pattern AND_PATTERN = Pattern.compile("[ ]*[@]AND[(]([:][A-Za-z0-9_]+(?:@LOOPINDEX[123]?)?)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
+  private static final Pattern AND_PATTERN = Pattern.compile(
+      "[ ]*[@]AND[(](" + VARIABLE_LOOPINDEX + ")" + "([ ]?[=][ ]?" + QUERY_TEXT + ")?" + "[)][ ]*");
   /**
-   * The regex for @OR(identifier).
+   * The regex for @OR(variable = query).
    */
-  private static final Pattern OR_PATTERN = Pattern.compile("[ ]*[@]OR[(]([:][A-Za-z0-9_]+(?:@LOOPINDEX[123]?)?)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
+  private static final Pattern OR_PATTERN = Pattern.compile(
+      "[ ]*[@]OR[(](" + VARIABLE_LOOPINDEX + ")" + "([ ]?[=][ ]?" + QUERY_TEXT + ")?" + "[)][ ]*");
   /**
-   * The regex for @IF(identifier).
+   * The regex for @IF(variable = query).
    */
-  private static final Pattern IF_PATTERN = Pattern.compile("[ ]*[@]IF[(]([:][A-Za-z0-9_]+(?:@LOOPINDEX[123]?)?)" + "([ ]?[=][ ]?[A-Za-z0-9_]+)?" + "[)][ ]*");
+  private static final Pattern IF_PATTERN = Pattern.compile(
+      "[ ]*[@]IF[(](" + VARIABLE_LOOPINDEX + ")" + "([ ]?[=][ ]?" + QUERY_TEXT + ")?" + "[)][ ]*");
   /**
    * The regex for @LOOP(variable)
    */
-  private static final Pattern LOOP_PATTERN = Pattern.compile("[ ]*[@]LOOP[(][:]([A-Za-z0-9_]+)[)][ ]*");
+  private static final Pattern LOOP_PATTERN = Pattern.compile(
+      "[ ]*[@]LOOP[(](" + VARIABLE + ")[)][ ]*");
   /**
-   * The regex for @INCLUDE(key)
+   * The regex for @INCLUDE(variable|identifier)
    */
-  private static final Pattern INCLUDE_PATTERN = Pattern.compile("[@]INCLUDE[(]([:]?[A-Za-z0-9_]+)[)](.*)");
+  private static final Pattern INCLUDE_PATTERN = Pattern.compile(
+      "[@]INCLUDE[(](" + VARIABLE + "|" + IDENTIFIER + ")[)](.*)");
   /**
-   * The regex for @PAGING(offsetVariable,fetchVariable)
+   * The regex for @PAGING(offsetVariableOrLiteral,fetchVariableOrLiteral)
    */
-  private static final Pattern PAGING_PATTERN = Pattern.compile("[@]PAGING[(]([0-9]+|[:][A-Za-z0-9_]+)[ ]?[,][ ]?([0-9]+|[:][A-Za-z0-9_]+)[)](.*)");
+  private static final Pattern PAGING_PATTERN = Pattern.compile(
+      "[@]PAGING[(](" + VARIABLE_OR_LITERAL + ")[ ]?[,][ ]?(" + VARIABLE_OR_LITERAL + ")[)](.*)");
   /**
-   * The regex for @OFFSETFETCH(offsetVariable,fetchVariable)
+   * The regex for @OFFSETFETCH(offsetVariableOrLiteral,fetchVariableOrLiteral)
    */
-  private static final Pattern OFFSET_FETCH_PATTERN = Pattern.compile("[@]OFFSETFETCH[(]([0-9]+|[:][A-Za-z0-9_]+)[ ]?[,][ ]?([0-9]+|[:][A-Za-z0-9_]+)[)](.*)");
+  private static final Pattern OFFSET_FETCH_PATTERN = Pattern.compile(
+      "[@]OFFSETFETCH[(](" + VARIABLE_OR_LITERAL + ")[ ]?[,][ ]?(" + VARIABLE_OR_LITERAL + ")[)](.*)");
   /**
-   * The regex for @FETCH(fetchVariable)
+   * The regex for @FETCH(fetchVariableOrLiteral)
    */
-  private static final Pattern FETCH_PATTERN = Pattern.compile("[@]FETCH[(]([0-9]+|[:][A-Za-z0-9_]+)[)](.*)");
+  private static final Pattern FETCH_PATTERN = Pattern.compile(
+      "[@]FETCH[(](" + VARIABLE_OR_LITERAL + ")[)](.*)");
   /**
    * The regex for @VALUE(variable)
    */
-  private static final Pattern VALUE_PATTERN = Pattern.compile("[@]VALUE[(][:]([A-Za-z0-9_]+(?:@LOOPINDEX[123]?)?)[)]( )*(.*)");
+  private static final Pattern VALUE_PATTERN = Pattern.compile(
+      "[@]VALUE[(](" + VARIABLE_LOOPINDEX + ")[)]( )*(.*)");
   /**
    * The regex for @LIKE and @EQUALS :variable
    */
-  private static final Pattern OPERATOR_VARIABLE_PATTERN = Pattern.compile("([^:])*([:][A-Za-z0-9_]+(?:@LOOPINDEX[123]?)?)(.*)");
+  private static final Pattern OPERATOR_VARIABLE_PATTERN = Pattern.compile(
+      "([^:])*(" + VARIABLE_LOOPINDEX + ")(.*)");
   /**
 
   /**

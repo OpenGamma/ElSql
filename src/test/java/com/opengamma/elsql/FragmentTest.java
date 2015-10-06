@@ -44,7 +44,7 @@ public class FragmentTest {
 
   //-------------------------------------------------------------------------
   public void test_ValueSqlFragment() {
-    ValueSqlFragment test = new ValueSqlFragment("test", true);
+    ValueSqlFragment test = new ValueSqlFragment(":test", true);
     assertEquals("ValueSqlFragment:test", test.toString());
   }
 
@@ -108,7 +108,7 @@ public class FragmentTest {
 
   //-------------------------------------------------------------------------
   public void test_LoopSqlFragment() {
-    LoopSqlFragment test = new LoopSqlFragment("test");
+    LoopSqlFragment test = new LoopSqlFragment(":test");
     assertEquals("LoopSqlFragment []", test.toString());
   }
 

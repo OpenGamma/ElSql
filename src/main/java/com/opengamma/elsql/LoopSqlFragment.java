@@ -8,9 +8,9 @@ package com.opengamma.elsql;
 import java.util.Arrays;
 
 /**
- * Representation of WHERE.
+ * Representation of a loop.
  * <p>
- * This outputs a WHERE clause if at least one child was output.
+ * This loops over the children a number of times.
  */
 final class LoopSqlFragment extends ContainerSqlFragment {
 
@@ -25,7 +25,10 @@ final class LoopSqlFragment extends ContainerSqlFragment {
    * @param variable  the variable to determine the loop size, not null
    */
   LoopSqlFragment(String variable) {
-    _sizeVariable = variable;
+    if (variable == null || variable.startsWith(":") == false || variable.length() < 2) {
+      throw new IllegalArgumentException("Argument is not a variable (starting with a colon)");
+    }
+    _sizeVariable = variable.substring(1);
   }
 
   //-------------------------------------------------------------------------
