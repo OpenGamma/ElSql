@@ -39,6 +39,10 @@
   <!-- Alphabetical list -->
   <contributors>
     <contributor>
+      <name>Claus Ibsen</name>
+      <url>https://github.com/davsclaus</url>
+    </contributor>
+    <contributor>
       <name>Mark Janssen</name>
       <url>https://github.com/praseodym</url>
     </contributor>
