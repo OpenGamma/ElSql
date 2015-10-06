@@ -26,13 +26,7 @@ abstract class ConditionalSqlFragment extends ContainerSqlFragment {
    * @param matchValue  the value to match, null to match on existence
    */
   ConditionalSqlFragment(String variable, String matchValue) {
-    if (variable == null) {
-      throw new IllegalArgumentException("Variable must be specified");
-    }
-    if (variable.startsWith(":") == false || variable.length() < 2) {
-      throw new IllegalArgumentException("Argument is not a variable (starting with a colon)");
-    }
-    _variable = variable.substring(1);
+    _variable = extractVariableName(variable);
     _matchValue = matchValue;
   }
 

@@ -30,7 +30,7 @@ final class ElSqlParser {
   /**
    * A variable.
    */
-  private static final String VARIABLE = "[:][A-Za-z0-9_]+";
+  private static final String VARIABLE = "[:](?:[A-Za-z0-9_]+|[$]?[{][A-Za-z0-9_.]+[}])";
   /**
    * A variable or literal number.
    */
@@ -38,7 +38,8 @@ final class ElSqlParser {
   /**
    * A variable with possible LOOPINDEX suffix.
    */
-  private static final String VARIABLE_LOOPINDEX = "[:][A-Za-z0-9_]+(?:@LOOPINDEX[123]?)?";
+  private static final String VARIABLE_LOOPINDEX =
+      "[:](?:[A-Za-z0-9_]+(?:@LOOPINDEX[123]?)?|[$]?[{][A-Za-z0-9_.]+(?:@LOOPINDEX[123]?)?[}])";
   /**
    * Text to match in AND/OR/IF.
    */

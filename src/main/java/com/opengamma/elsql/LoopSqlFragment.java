@@ -25,10 +25,7 @@ final class LoopSqlFragment extends ContainerSqlFragment {
    * @param variable  the variable to determine the loop size, not null
    */
   LoopSqlFragment(String variable) {
-    if (variable == null || variable.startsWith(":") == false || variable.length() < 2) {
-      throw new IllegalArgumentException("Argument is not a variable (starting with a colon)");
-    }
-    _sizeVariable = variable.substring(1);
+    _sizeVariable = extractVariableName(variable);
   }
 
   //-------------------------------------------------------------------------
@@ -41,6 +38,8 @@ final class LoopSqlFragment extends ContainerSqlFragment {
       size = ((Number) sizeObj).intValue();
     } else if (sizeObj instanceof String) {
       size = Integer.parseInt((String) sizeObj);
+    } else if (sizeObj == null) {
+      throw new IllegalArgumentException("Loop size variable not found: " + _sizeVariable);
     } else {
       throw new IllegalArgumentException("Loop size variable must be Number or String: " + _sizeVariable);
     }

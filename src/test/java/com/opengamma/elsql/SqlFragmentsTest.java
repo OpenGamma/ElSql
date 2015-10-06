@@ -197,6 +197,19 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE TRUE ", sql1);
   }
 
+  public void test_include_variable_extendedFormat() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM @INCLUDE(:{var}) WHERE TRUE",
+        "  ",
+        "@NAME(Table)",
+        "  foo"
+    );
+    SqlFragments bundle = SqlFragments.parse(lines);
+    String sql1 = bundle.getSql("Test1", new MapSqlParams("var", "Table"));
+    assertEquals("SELECT * FROM foo WHERE TRUE ", sql1);
+  }
+
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void test_include_variable_notFound() {
     List<String> lines = Arrays.asList(
@@ -403,6 +416,18 @@ public class SqlFragmentsTest {
         "@NAME(Test1)",
         "  SELECT * FROM foo",
         "  @OFFSETFETCH(:offset, :fetch) ENDFOO"
+    );
+    SqlFragments bundle = SqlFragments.parse(lines);
+    SqlParams params = new MapSqlParams("offset", 7).with("fetch", 3);
+    String sql1 = bundle.getSql("Test1", params);
+    assertEquals("SELECT * FROM foo OFFSET 7 ROWS FETCH NEXT 3 ROWS ONLY ENDFOO ", sql1);
+  }
+
+  public void test_offsetFetch_specifiedVars_extendedFormat() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  @OFFSETFETCH(:{offset}, :{fetch}) ENDFOO"
     );
     SqlFragments bundle = SqlFragments.parse(lines);
     SqlParams params = new MapSqlParams("offset", 7).with("fetch", 3);
@@ -709,12 +734,38 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo ", sql1);
   }
 
+  public void test_and_1and_varAbsent_extendedFormat() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  @WHERE",
+        "    @AND(:{var})",
+        "      var = :var"
+    );
+    SqlFragments bundle = SqlFragments.parse(lines);
+    String sql1 = bundle.getSql("Test1", EmptySqlParams.INSTANCE);
+    assertEquals("SELECT * FROM foo ", sql1);
+  }
+
   public void test_and_1and_varPresent() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
         "  SELECT * FROM foo",
         "  @WHERE",
         "    @AND(:var)",
+        "      var = :var"
+    );
+    SqlFragments bundle = SqlFragments.parse(lines);
+    String sql1 = bundle.getSql("Test1", new MapSqlParams("var", "val"));
+    assertEquals("SELECT * FROM foo WHERE var = :var ", sql1);
+  }
+
+  public void test_and_1and_varPresent_extendedFormat() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo",
+        "  @WHERE",
+        "    @AND(:{var})",
         "      var = :var"
     );
     SqlFragments bundle = SqlFragments.parse(lines);
@@ -1031,6 +1082,17 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM mytable WHERE true ", sql1);
   }
 
+  public void test_value_extendedFormat() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM @VALUE(:{var}) WHERE true"
+    );
+    SqlFragments bundle = SqlFragments.parse(lines);
+    SqlParams params = new MapSqlParams("var", "mytable");
+    String sql1 = bundle.getSql("Test1", params);
+    assertEquals("SELECT * FROM mytable WHERE true ", sql1);
+  }
+
   public void test_value_followedByComma() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1104,6 +1166,21 @@ public class SqlFragmentsTest {
         "@NAME(Test1)",
         "  SELECT * FROM foo WHERE",
         "  @LOOP(:size)",
+        "    (a = :a@LOOPINDEX AND b = :b@LOOPINDEX)"
+    );
+    SqlFragments bundle = SqlFragments.parse(lines);
+    SqlParams params = new MapSqlParams("size", 2)
+      .with("a0", "name").with("b0", "bob")
+      .with("b0", "type").with("b1", "doctor");
+    String sql1 = bundle.getSql("Test1", params);
+    assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = :b0) (a = :a1 AND b = :b1) ", sql1);
+  }
+
+  public void test_loopNoJoin_extendedFormat() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo WHERE",
+        "  @LOOP(:{size})",
         "    (a = :a@LOOPINDEX AND b = :b@LOOPINDEX)"
     );
     SqlFragments bundle = SqlFragments.parse(lines);
@@ -1198,6 +1275,22 @@ public class SqlFragmentsTest {
         "  SELECT * FROM foo WHERE",
         "  @LOOP(:size)",
         "    (a = :a@LOOPINDEX AND b = @VALUE(:b@LOOPINDEX1))",
+        "    @LOOPJOIN OR"
+    );
+    SqlFragments bundle = SqlFragments.parse(lines);
+    SqlParams params = new MapSqlParams("size", 2)
+      .with("a0", "name").with("b0", "bob")
+      .with("a1", "type").with("b1", "doctor");
+    String sql1 = bundle.getSql("Test1", params);
+    assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = bob) OR (a = :a1 AND b = doctor) ", sql1);
+  }
+
+  public void test_loopWithJoin_value_extendedFormat() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo WHERE",
+        "  @LOOP(:{size})",
+        "    (a = :a@LOOPINDEX AND b = @VALUE(:{b@LOOPINDEX1}))",
         "    @LOOPJOIN OR"
     );
     SqlFragments bundle = SqlFragments.parse(lines);
