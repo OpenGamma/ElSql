@@ -10,6 +10,10 @@
     <!-- types are add, fix, remove, update -->
     <release version="1.1.1" date="SNAPSHOT" description="v1.1.1">
       <action dev="jodastephen" type="add">
+        Allow LOOP tag to support literal integers as well as variables.
+        Fixes #25.
+      </action>
+      <action dev="jodastephen" type="add">
         Allow extended formats of variables.
         Can use :{foo} instead of :foo.
         Can also use :${foo} which could be mapped to some kind of dynamic function

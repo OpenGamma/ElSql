@@ -1191,6 +1191,21 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = :b0) (a = :a1 AND b = :b1) ", sql1);
   }
 
+  public void test_loopNoJoin_hardCodedSize() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT * FROM foo WHERE",
+        "  @LOOP(2)",
+        "    (a = :a@LOOPINDEX AND b = :b@LOOPINDEX)"
+    );
+    SqlFragments bundle = SqlFragments.parse(lines);
+    SqlParams params = new MapSqlParams("a0", "name")
+      .with("b0", "bob")
+      .with("b0", "type").with("b1", "doctor");
+    String sql1 = bundle.getSql("Test1", params);
+    assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = :b0) (a = :a1 AND b = :b1) ", sql1);
+  }
+
   public void test_loopWithJoin() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",

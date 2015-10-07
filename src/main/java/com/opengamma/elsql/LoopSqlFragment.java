@@ -15,7 +15,7 @@ import java.util.Arrays;
 final class LoopSqlFragment extends ContainerSqlFragment {
 
   /**
-   * The size variable.
+   * The size variable name (starting with a colon) or numeric literal.
    */
   private final String _sizeVariable;
 
@@ -25,24 +25,14 @@ final class LoopSqlFragment extends ContainerSqlFragment {
    * @param variable  the variable to determine the loop size, not null
    */
   LoopSqlFragment(String variable) {
-    _sizeVariable = extractVariableName(variable);
+    _sizeVariable = variable;
   }
 
   //-------------------------------------------------------------------------
   @Override
   void toSQL(StringBuilder buf, SqlFragments fragments, SqlParams params, int[] loopIndex) {
     // find loop size
-    Object sizeObj = params.get(_sizeVariable);
-    int size;
-    if (sizeObj instanceof Number) {
-      size = ((Number) sizeObj).intValue();
-    } else if (sizeObj instanceof String) {
-      size = Integer.parseInt((String) sizeObj);
-    } else if (sizeObj == null) {
-      throw new IllegalArgumentException("Loop size variable not found: " + _sizeVariable);
-    } else {
-      throw new IllegalArgumentException("Loop size variable must be Number or String: " + _sizeVariable);
-    }
+    int size = extractSize(params);
     // loop
     int[] childLoopIndex = Arrays.copyOf(loopIndex, loopIndex.length + 1);
     for (int i = 0; i < size; i++) {
@@ -58,6 +48,24 @@ final class LoopSqlFragment extends ContainerSqlFragment {
         }
       }
       buf.append(part);
+    }
+  }
+
+  private int extractSize(SqlParams params) {
+    if (_sizeVariable.startsWith(":")) {
+      String var = extractVariableName(_sizeVariable);
+      Object sizeObj = params.get(var);
+      if (sizeObj instanceof Number) {
+        return ((Number) sizeObj).intValue();
+      } else if (sizeObj instanceof String) {
+        return Integer.parseInt((String) sizeObj);
+      } else if (sizeObj == null) {
+        throw new IllegalArgumentException("Loop size variable not found: " + var);
+      } else {
+        throw new IllegalArgumentException("Loop size variable must be Number or String: " + var);
+      }
+    } else {
+      return Integer.parseInt(_sizeVariable);
     }
   }
 

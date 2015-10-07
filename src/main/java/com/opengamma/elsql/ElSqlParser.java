@@ -69,7 +69,7 @@ final class ElSqlParser {
    * The regex for @LOOP(variable)
    */
   private static final Pattern LOOP_PATTERN = Pattern.compile(
-      "[ ]*[@]LOOP[(](" + VARIABLE + ")[)][ ]*");
+      "[ ]*[@]LOOP[(](" + VARIABLE_OR_LITERAL + ")[)][ ]*");
   /**
    * The regex for @INCLUDE(variable|identifier)
    */
