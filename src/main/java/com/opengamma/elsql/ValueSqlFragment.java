@@ -28,10 +28,7 @@ final class ValueSqlFragment extends SqlFragment {
    * @param followWithSpace  whether to follow by a space
    */
   ValueSqlFragment(String valueVariable, boolean followWithSpace) {
-    if (valueVariable == null || valueVariable.startsWith(":") == false || valueVariable.length() < 2) {
-      throw new IllegalArgumentException("Argument is not a variable (starting with a colon)");
-    }
-    _valueVariable = valueVariable.substring(1);
+    _valueVariable = extractVariableName(valueVariable);
     _followWithSpace = followWithSpace;
   }
 

@@ -32,9 +32,24 @@ public class FragmentTest {
   }
 
   //-------------------------------------------------------------------------
-  public void test_IncludeSqlFragment() {
+  public void test_IncludeSqlFragment_id() {
     IncludeSqlFragment test = new IncludeSqlFragment("test");
     assertEquals("IncludeSqlFragment:test", test.toString());
+  }
+
+  public void test_IncludeSqlFragment_var() {
+    IncludeSqlFragment test = new IncludeSqlFragment(":test");
+    assertEquals("IncludeSqlFragment::test", test.toString());
+  }
+
+  public void test_IncludeSqlFragment_varExtended() {
+    IncludeSqlFragment test = new IncludeSqlFragment(":{test}");
+    assertEquals("IncludeSqlFragment::{test}", test.toString());
+  }
+
+  public void test_IncludeSqlFragment_varExtendedDollar() {
+    IncludeSqlFragment test = new IncludeSqlFragment(":${test}");
+    assertEquals("IncludeSqlFragment::${test}", test.toString());
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
@@ -46,6 +61,16 @@ public class FragmentTest {
   public void test_ValueSqlFragment() {
     ValueSqlFragment test = new ValueSqlFragment(":test", true);
     assertEquals("ValueSqlFragment:test", test.toString());
+  }
+
+  public void test_ValueSqlFragment_extended() {
+    ValueSqlFragment test = new ValueSqlFragment(":{test}", true);
+    assertEquals("ValueSqlFragment:test", test.toString());
+  }
+
+  public void test_ValueSqlFragment_extendedDollar() {
+    ValueSqlFragment test = new ValueSqlFragment(":${test}", true);
+    assertEquals("ValueSqlFragment:${test}", test.toString());
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)

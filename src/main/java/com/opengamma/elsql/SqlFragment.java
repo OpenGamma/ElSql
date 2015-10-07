@@ -44,6 +44,23 @@ abstract class SqlFragment {
   }
 
   /**
+   * Extracts the variable name from the elsql colon-prefixed format.
+   * 
+   * @param variable  the variable to parse
+   * @return the variable name
+   */
+  static String extractVariableName(String variable) {
+    if (variable == null || variable.startsWith(":") == false || variable.length() < 2) {
+      throw new IllegalArgumentException("Argument is not a variable (starting with a colon)");
+    }
+    String postColon = variable.substring(1);
+    if (postColon.startsWith("{") && postColon.endsWith("}")) {
+      return postColon.substring(1, postColon.length() - 1);
+    }
+    return postColon;
+  }
+
+  /**
    * Given a variable or literal string, extract the value.
    * 
    * @param params  the SQL parameters
@@ -53,7 +70,7 @@ abstract class SqlFragment {
   static int extractVariableOrLiteral(SqlParams params, String str) {
     if (str != null) {
       if (str.startsWith(":") && str.length() > 1) {
-        String fetchVariableName = str.substring(1);
+        String fetchVariableName = extractVariableName(str);
         if (params.contains(fetchVariableName)) {
           return ((Number) params.get(fetchVariableName)).intValue();
         }
