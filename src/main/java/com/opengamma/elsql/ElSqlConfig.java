@@ -257,8 +257,29 @@ public class ElSqlConfig {
       return "SELECT * FROM (" + inner + ") AS ROW_TABLE WHERE ROW_NUM >= " + start + " AND ROW_NUM <= " + end;
     }
     @Override
+    public String getLikeSuffix() {
+      return "ESCAPE '\\' ";
+    }
+    @Override
     public String getPaging(int offset, int fetchLimit) {
       throw new UnsupportedOperationException();
+    }
+    @Override
+    public boolean isLikeWildcard(String value) {
+      boolean escape = false;
+      for (int i = 0; i < value.length(); i++) {
+        char ch = value.charAt(i);
+        if (escape) {
+          escape = false;
+        } else {
+          if (ch == '\\') {
+            escape = true;
+          } else if (ch == '%' || ch == '_' || ch == '[') {
+            return true;
+          }
+        }
+      }
+      return false;
     }
   }
 
