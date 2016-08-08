@@ -51,6 +51,16 @@ public class SqlFragmentsTest {
     SqlFragments.parse(lines);
   }
 
+  public void test_unknownTagMidLine() {
+    List<String> lines = Arrays.asList(
+        "@NAME(Test1)",
+        "  SELECT *",
+        "  FROM @WIBBLE");
+    SqlFragments bundle = SqlFragments.parse(lines);
+    String sql1 = bundle.getSql("Test1", EmptySqlParams.INSTANCE);
+    assertEquals("SELECT * FROM @WIBBLE ", sql1);
+  }
+
   public void test_name_1name_1line_noParameters() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
