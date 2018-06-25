@@ -6,7 +6,7 @@
   <artifactId>elsql</artifactId>
   <packaging>jar</packaging>
   <name>ElSql</name>
-  <version>1.2.1-SNAPSHOT</version>
+  <version>1.3</version>
   <description>Simple tool to externalize SQL from Java</description>
   <url>https://github.com/OpenGamma/ElSql</url>
 
@@ -478,14 +478,14 @@
   <!-- ==================================================================== -->
   <distributionManagement>
     <repository>
-      <id>sonatype-opengamma-staging</id>
+      <id>oss-sonatype</id>
       <name>Sonatype OSS staging repository</name>
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
       <layout>default</layout>
     </repository>
     <snapshotRepository>
       <uniqueVersion>false</uniqueVersion>
-      <id>sonatype-opengamma-snapshot</id>
+      <id>oss-sonatype</id>
       <name>Sonatype OSS snapshot repository</name>
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
       <layout>default</layout>

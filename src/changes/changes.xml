@@ -8,9 +8,17 @@
   <body>
 
     <!-- types are add, fix, remove, update -->
-    <release version="1.2.1" date="SNAPSHOT" description="v1.2.1">
+    <release version="1.3" date="2018-06-25" description="v1.3">
+      <action dev="evpaassen" type="update">
+        Enhance support for SQL Server 2008+.
+      </action>
+      <action dev="snyk-bot" type="update">
+        Update optional Spring dependency.
+        Fixes #31.
+      </action>
       <action dev="jodastephen" type="update">
         Update build.
+        Fixes #27.
       </action>
     </release>
     <release version="1.2" date="2015-10-07" description="v1.2">
