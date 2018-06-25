@@ -49,6 +49,7 @@ public final class MapSqlParams implements SqlParams {
    * 
    * @param key  the key to add
    * @param value  the value to add
+   * @return the new instance with pair added
    */
   public MapSqlParams with(String key, Object value) {
     Map<String, Object> map = new HashMap<String, Object>(_map);
