@@ -580,6 +580,6 @@
     <!-- Other properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <spring.version>3.2.9.RELEASE</spring.version>
+    <spring.version>3.2.14.RELEASE</spring.version>
   </properties>
 </project>
