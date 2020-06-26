@@ -115,6 +115,6 @@ Some useful project links:
 * [Wiki](https://github.com/OpenGamma/ElSql/wiki/Home) - including an [example](https://github.com/OpenGamma/ElSql/wiki/Example)
 * [Javadoc](http://opengamma.github.com/ElSql/apidocs/index.html) - the six public classes
 * [Issue tracker](https://github.com/OpenGamma/ElSql/issues) - raise bugs or enhancement requests here
-* [Project sponsor](http://developers.opengamma.com/) - the project is supported by OpenGamma
+* [Project sponsor](https://opengamma.com/) - the project is supported by OpenGamma
 
 ElSql is licensed under the Apache License v2.
