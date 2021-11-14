@@ -320,6 +320,9 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${maven-surefire-plugin.version}</version>
+    <configuration>
+    	<disableXmlReport>${closeTestReports}</disableXmlReport>
+    </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -581,5 +584,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <spring.version>3.2.14.RELEASE</spring.version>
+  	<closeTestReports>true</closeTestReports>
   </properties>
 </project>
