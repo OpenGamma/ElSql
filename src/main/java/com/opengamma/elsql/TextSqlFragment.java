@@ -27,11 +27,11 @@ final class TextSqlFragment extends SqlFragment {
       throw new IllegalArgumentException("Text must be specified");
     }
     if (endOfLine) {
-      text = text.trim();
-      if (text.length() == 0) {
+      String trimmed = text.trim();
+      if (trimmed.length() == 0) {
         _text = "";
       } else {
-        _text = text + " ";
+        _text = trimmed + " ";
       }
     } else {
       _text = text;

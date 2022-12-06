@@ -5,16 +5,16 @@
  */
 package com.opengamma.elsql;
 
-import static org.testng.AssertJUnit.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test.
  */
-@Test
 public class EmptySqlParamsTest {
 
+  @Test
   public void test_constructor_Map() {
     SqlParams test = EmptySqlParams.INSTANCE;
     assertEquals(false, test.contains("x"));

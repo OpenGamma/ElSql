@@ -5,17 +5,18 @@
  */
 package com.opengamma.elsql;
 
-import static org.testng.AssertJUnit.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.testng.annotations.Test;
 
 /**
  * Test.
  */
-@Test
 public class SpringSqlParamsTest {
 
+  @Test
   public void test_constructor_Map() {
     MapSqlParameterSource source = new MapSqlParameterSource();
     source.addValue("a", "b");
@@ -26,9 +27,9 @@ public class SpringSqlParamsTest {
     assertEquals(null, test.get("x"));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_constructor_Map_null() {
-    new SpringSqlParams(null);
+    assertThrows(IllegalArgumentException.class, () -> new SpringSqlParams(null));
   }
 
 }
