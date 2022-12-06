@@ -5,7 +5,8 @@
  */
 package com.opengamma.elsql;
 
-import static org.testng.AssertJUnit.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,44 +14,44 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test.
  */
-@Test
 public class SqlFragmentsTest {
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_constructor_nullMap() {
-    new SqlFragments(null, ElSqlConfig.DEFAULT);
+    assertThrows(IllegalArgumentException.class, () -> new SqlFragments(null, ElSqlConfig.DEFAULT));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_constructor_nullConfig() {
-    new SqlFragments(new HashMap<String, NameSqlFragment>(), null);
+    assertThrows(IllegalArgumentException.class, () -> new SqlFragments(new HashMap<String, NameSqlFragment>(), null));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_withConfig_null() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
         "  SELECT * FROM foo"
     );
     SqlFragments bundle = SqlFragments.parse(lines);
-    bundle.withConfig(null);
+    assertThrows(IllegalArgumentException.class, () -> bundle.withConfig(null));
   }
 
   //-------------------------------------------------------------------------
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_invalidTab() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
         "\tSELECT * FROM foo"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
+  @Test
   public void test_unknownTagMidLine() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -61,6 +62,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM @WIBBLE ", sql1);
   }
 
+  @Test
   public void test_name_1name_1line_noParameters() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -72,6 +74,7 @@ public class SqlFragmentsTest {
   }
 
   //-------------------------------------------------------------------------
+  @Test
   public void test_name_1name_1line() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -82,6 +85,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo ", sql1);
   }
 
+  @Test
   public void test_name_2names_1line() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -97,6 +101,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM bar ", sql2);
   }
 
+  @Test
   public void test_name_2names_2lines() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -114,6 +119,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM bar WHERE FALSE ", sql2);
   }
 
+  @Test
   public void test_name_midComments() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -127,46 +133,47 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM WHERE TRUE ", sql1);
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_name_invalidFormat1() {
     List<String> lines = Arrays.asList(
         "@NAME("
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_invalidFormat2() {
     List<String> lines = Arrays.asList(
         "@NAME()"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_name_invalidFormat3() {
     List<String> lines = Arrays.asList(
         "@NAME(!)"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_name_invalidFormat4() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
         "@NAME(Test2)"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_name_notFound() {
     SqlFragments bundle = SqlFragments.parse(new ArrayList<String>());
-    bundle.getSql("Unknown", EmptySqlParams.INSTANCE);
+    assertThrows(IllegalArgumentException.class, () -> bundle.getSql("Unknown", EmptySqlParams.INSTANCE));
   }
 
   //-------------------------------------------------------------------------
+  @Test
   public void test_insert_name() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -182,7 +189,7 @@ public class SqlFragmentsTest {
     assertEquals("foo ", sql2);
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_insert_name_notFound() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -190,10 +197,11 @@ public class SqlFragmentsTest {
         "  "
     );
     SqlFragments bundle = SqlFragments.parse(lines);
-    bundle.getSql("Test1", EmptySqlParams.INSTANCE);
+    assertThrows(IllegalArgumentException.class, () -> bundle.getSql("Test1", EmptySqlParams.INSTANCE));
   }
 
   //-------------------------------------------------------------------------
+  @Test
   public void test_include_variable() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -207,6 +215,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE TRUE ", sql1);
   }
 
+  @Test
   public void test_include_variable_extendedFormat() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -220,7 +229,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE TRUE ", sql1);
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_include_variable_notFound() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -228,19 +237,20 @@ public class SqlFragmentsTest {
         "  "
     );
     SqlFragments bundle = SqlFragments.parse(lines);
-    bundle.getSql("Test1", EmptySqlParams.INSTANCE);
+    assertThrows(IllegalArgumentException.class, () -> bundle.getSql("Test1", EmptySqlParams.INSTANCE));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_include_invalidFormat1() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
         "  SELECT * FROM @INCLUDE(:var WHERE TRUE"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
   //-------------------------------------------------------------------------
+  @Test
   public void test_like_equals() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -252,6 +262,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE var = :var ", sql1);
   }
 
+  @Test
   public void test_like_likePercent() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -263,6 +274,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE var LIKE :var ", sql1);
   }
 
+  @Test
   public void test_like_likeUnderscore() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -274,6 +286,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE var LIKE :var ", sql1);
   }
 
+  @Test
   public void test_like_isNull() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -285,6 +298,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE var IS NULL ", sql1);
   }
 
+  @Test
   public void test_likeEndLike_equals() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -296,6 +310,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE (var = :var ) ", sql1);
   }
 
+  @Test
   public void test_likeEndLike_like() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -307,6 +322,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE (var LIKE :var ) ", sql1);
   }
 
+  @Test
   public void test_likeEndLike_like_configEscape() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -319,17 +335,18 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE (var LIKE :var ESCAPE '\\' ) ", sql1);
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_like_invalidFormat1() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
         "  SELECT * FROM foo",
         "  WHERE (var @LIKE"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
   //-------------------------------------------------------------------------
+  @Test
   public void test_equals_equals()  {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -341,6 +358,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE var = :var ", sql1);   
   }
 
+  @Test
   public void test_equals_isNull() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -352,6 +370,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE var IS NULL ", sql1);       
   }
 
+  @Test
   public void test_equalsEndEquals_equals() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -363,6 +382,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE (var = :var ) ", sql1);
   }
 
+  @Test
   public void test_equalsEndEquals_isNull() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -374,17 +394,18 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE (var IS NULL ) ", sql1);
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_equals_invalidFormat1() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
         "  SELECT * FROM foo",
         "  WHERE (var @EQUALS"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
   //-------------------------------------------------------------------------
+  @Test
   public void test_offsetFetch_bothDefaultVars() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -397,6 +418,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo OFFSET 7 ROWS FETCH NEXT 3 ROWS ONLY ", sql1);
   }
 
+  @Test
   public void test_offsetFetch_offsetDefaultVar() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -409,6 +431,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo OFFSET 7 ROWS ", sql1);
   }
 
+  @Test
   public void test_offsetFetch_fetchDefaultVar() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -421,6 +444,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo FETCH FIRST 3 ROWS ONLY ", sql1);
   }
 
+  @Test
   public void test_offsetFetch_specifiedVars() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -433,6 +457,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo OFFSET 7 ROWS FETCH NEXT 3 ROWS ONLY ENDFOO ", sql1);
   }
 
+  @Test
   public void test_offsetFetch_specifiedVars_extendedFormat() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -445,6 +470,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo OFFSET 7 ROWS FETCH NEXT 3 ROWS ONLY ENDFOO ", sql1);
   }
 
+  @Test
   public void test_offsetFetch_specifiedLiterals() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -457,6 +483,7 @@ public class SqlFragmentsTest {
   }
 
   //-------------------------------------------------------------------------
+  @Test
   public void test_paging_specifiedVars() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -469,6 +496,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo ORDER BY bar OFFSET 7 ROWS FETCH NEXT 3 ROWS ONLY ", sql1);
   }
 
+  @Test
   public void test_paging_specifiedLiterals() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -480,27 +508,28 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo ORDER BY bar OFFSET 8 ROWS FETCH NEXT 4 ROWS ONLY ", sql1);
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_paging_invalidFormat1() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
         "  @PAGING(:offset, :fetch",
         "    SELECT * FROM foo ORDER BY bar "
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_paging_invalidFormat2() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
         "  @PAGING(:offset, :fetch)",
         "  @PAGING(:offset, :fetch)"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
   //-------------------------------------------------------------------------
+  @Test
   public void test_fetch_defaultVar() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -513,6 +542,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo FETCH FIRST 3 ROWS ONLY ", sql1);
   }
 
+  @Test
   public void test_fetch_specifiedVars() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -525,6 +555,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo FETCH FIRST 4 ROWS ONLY ENDFOO ", sql1);
   }
 
+  @Test
   public void test_fetch_amount() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -538,6 +569,7 @@ public class SqlFragmentsTest {
   }
 
   //-------------------------------------------------------------------------
+  @Test
   public void test_if_varAbsent() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -550,6 +582,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo ", sql1);
   }
 
+  @Test
   public void test_if_varPresent() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -562,6 +595,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE var = :var ", sql1);
   }
 
+  @Test
   public void test_if_varPresentNull() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -574,6 +608,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo ", sql1);
   }
 
+  @Test
   public void test_if_varPresentBooleanFalse() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -586,6 +621,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo ", sql1);
   }
 
+  @Test
   public void test_if_varPresentBooleanTrue() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -598,6 +634,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE var = :var ", sql1);
   }
 
+  @Test
   public void test_if_varPresentBooleanFalseEqualsFalse() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -610,6 +647,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE var = :var ", sql1);
   }
 
+  @Test
   public void test_if_varPresentBooleanFalseEqualsTrue() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -622,6 +660,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo ", sql1);
   }
 
+  @Test
   public void test_if_varPresentBooleanTrueEqualsFalse() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -634,6 +673,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo ", sql1);
   }
 
+  @Test
   public void test_if_varPresentBooleanTrueEqualsTrue() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -646,6 +686,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE var = :var ", sql1);
   }
 
+  @Test
   public void test_if_withMatch_varPresentMatch() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -658,6 +699,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE var = :var ", sql1);
   }
 
+  @Test
   public void test_if_withMatch_varPresentNoMatch() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -670,6 +712,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo ", sql1);
   }
 
+  @Test
   public void test_if_withMatch_varPresentMatchNull() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -682,7 +725,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo ", sql1);
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_if_invalidFormat1() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -691,10 +734,10 @@ public class SqlFragmentsTest {
         "    @IF(:var",
         "      var = :var"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_if_invalidFormat2() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -703,11 +746,11 @@ public class SqlFragmentsTest {
         "    @IF(:var)",
         "    @IF(:var)"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
   //-------------------------------------------------------------------------
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_where_invalidFormat1() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -716,10 +759,10 @@ public class SqlFragmentsTest {
         "    @AND(:var)",
         "      var = :var"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_where_invalidFormat2() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -727,10 +770,11 @@ public class SqlFragmentsTest {
         "  @WHERE",
         "  @WHERE"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
   //-------------------------------------------------------------------------
+  @Test
   public void test_and_1and_varAbsent() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -744,6 +788,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo ", sql1);
   }
 
+  @Test
   public void test_and_1and_varAbsent_extendedFormat() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -757,6 +802,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo ", sql1);
   }
 
+  @Test
   public void test_and_1and_varPresent() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -770,6 +816,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE var = :var ", sql1);
   }
 
+  @Test
   public void test_and_1and_varPresent_extendedFormat() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -783,6 +830,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE var = :var ", sql1);
   }
 
+  @Test
   public void test_and_2and_varPresentAbsent() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -798,6 +846,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE var = :var ", sql1);
   }
 
+  @Test
   public void test_and_2and_varAbsentPresent() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -813,6 +862,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE vax = :vax ", sql1);
   }
 
+  @Test
   public void test_and_2and_varPresent() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -829,6 +879,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE var = :var AND vax = :vax ", sql1);
   }
 
+  @Test
   public void test_and_withMatch_varAbsent() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -842,6 +893,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo ", sql1);
   }
 
+  @Test
   public void test_and_withMatch_varPresentMatch() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -855,6 +907,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE var = :var ", sql1);
   }
 
+  @Test
   public void test_and_withMatch_varPresentNoMatch() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -868,6 +921,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo ", sql1);
   }
 
+  @Test
   public void test_and_withMatch_varPresentNull() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -881,32 +935,32 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo ", sql1);
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_and_invalidFormat1() {
     List<String> lines = Arrays.asList(
         "@AND("
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_and_invalidFormat2() {
     List<String> lines = Arrays.asList(
         "@AND()"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_and_invalidFormat3() {
     List<String> lines = Arrays.asList(
         "@AND(!)"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_and_invalidFormat4() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -915,10 +969,10 @@ public class SqlFragmentsTest {
         "    @AND(:var",
         "      var = :var"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_and_invalidFormat5() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -927,10 +981,11 @@ public class SqlFragmentsTest {
         "    @AND(:var)",
         "    @AND(:var)"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
   //-------------------------------------------------------------------------
+  @Test
   public void test_or_1or_varAbsent() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -944,6 +999,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo ", sql1);
   }
 
+  @Test
   public void test_or_1or_varPresent() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -957,6 +1013,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE var = :var ", sql1);
   }
 
+  @Test
   public void test_or_2or_varPresentAbsent() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -972,6 +1029,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE var = :var ", sql1);
   }
 
+  @Test
   public void test_or_2or_varAbsentPresent() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -987,6 +1045,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE vax = :vax ", sql1);
   }
 
+  @Test
   public void test_or_2or_varPresent() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1003,32 +1062,32 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE var = :var OR vax = :vax ", sql1);
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_or_invalidFormat1() {
     List<String> lines = Arrays.asList(
         "@OR("
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_or_invalidFormat2() {
     List<String> lines = Arrays.asList(
         "@OR()"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_or_invalidFormat3() {
     List<String> lines = Arrays.asList(
         "@OR(!)"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_or_invalidFormat4() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1037,10 +1096,10 @@ public class SqlFragmentsTest {
         "    @OR(:var",
         "      var = :var"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_or_invalidFormat5() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1049,38 +1108,39 @@ public class SqlFragmentsTest {
         "    @OR(:var)",
         "    @OR(:var)"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
   //-------------------------------------------------------------------------
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_topLevelNotName1() {
     List<String> lines = Arrays.asList(
         "@AND(:var)",
         "  var = :var"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_topLevelNotName2() {
     List<String> lines = Arrays.asList(
         "SELECT foo FROM bar"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_unknownTagAtStartLine() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
         "  SELECT * FROM foo",
         "  @UNKNOWN"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
   //-------------------------------------------------------------------------
+  @Test
   public void test_value() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1092,6 +1152,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM mytable WHERE true ", sql1);
   }
 
+  @Test
   public void test_value_extendedFormat() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1103,6 +1164,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM mytable WHERE true ", sql1);
   }
 
+  @Test
   public void test_value_followedByComma() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1114,6 +1176,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM mytable, vax ", sql1);
   }
 
+  @Test
   public void test_value_insertContainsComma() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1125,6 +1188,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM base , mytable ", sql1);
   }
 
+  @Test
   public void test_value_null() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1136,6 +1200,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM base ", sql1);
   }
 
+  @Test
   public void test_value_like() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1150,6 +1215,7 @@ public class SqlFragmentsTest {
         "AND doc.id IN ( SELECT id FROM mytable_idkey WHERE key_scheme = :scheme ) ", sql1);
   }
 
+  @Test
   public void test_value_fetch() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1161,16 +1227,17 @@ public class SqlFragmentsTest {
     assertEquals("AA mytable FETCH FIRST 10 ROWS ONLY ", sql1);
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_value_invalidFormat1() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
         "  AA @VALUE(:var @FETCH"
     );
-    SqlFragments.parse(lines);
+    assertThrows(IllegalArgumentException.class, () -> SqlFragments.parse(lines));
   }
 
   //-------------------------------------------------------------------------
+  @Test
   public void test_loopNoJoin() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1186,6 +1253,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = :b0) (a = :a1 AND b = :b1) ", sql1);
   }
 
+  @Test
   public void test_loopNoJoin_extendedFormat() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1201,6 +1269,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = :b0) (a = :a1 AND b = :b1) ", sql1);
   }
 
+  @Test
   public void test_loopNoJoin_hardCodedSize() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1216,6 +1285,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = :b0) (a = :a1 AND b = :b1) ", sql1);
   }
 
+  @Test
   public void test_loopWithJoin() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1232,6 +1302,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = :b0) OR (a = :a1 AND b = :b1) ", sql1);
   }
 
+  @Test
   public void test_loopWithJoin_sizeString() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1247,6 +1318,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = :b0) ", sql1);
   }
 
+  @Test
   public void test_loopWithJoin_sizeZeroWithWhereTag() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1262,6 +1334,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo ", sql1);
   }
 
+  @Test
   public void test_loopWithJoin_like() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1278,6 +1351,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = :b0 ) OR (a = :a1 AND b = :b1 ) ", sql1);
   }
 
+  @Test
   public void test_loopWithJoin_likeSpace() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1294,6 +1368,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = :b0 ) OR (a = :a1 AND b = :b1 ) ", sql1);
   }
 
+  @Test
   public void test_loopWithJoin_value() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1310,6 +1385,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = bob) OR (a = :a1 AND b = doctor) ", sql1);
   }
 
+  @Test
   public void test_loopWithJoin_value_extendedFormat() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1326,7 +1402,7 @@ public class SqlFragmentsTest {
     assertEquals("SELECT * FROM foo WHERE (a = :a0 AND b = bob) OR (a = :a1 AND b = doctor) ", sql1);
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_loop_sizeBadType() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",
@@ -1338,9 +1414,10 @@ public class SqlFragmentsTest {
     SqlFragments bundle = SqlFragments.parse(lines);
     SqlParams params = new MapSqlParams("size", new Date())
       .with("a0", "name").with("b0", "bob");
-    bundle.getSql("Test1", params);
+    assertThrows(IllegalArgumentException.class, () -> bundle.getSql("Test1", params));
   }
 
+  @Test
   public void test_loopInLoopWithJoin() {
     List<String> lines = Arrays.asList(
         "@NAME(Test1)",

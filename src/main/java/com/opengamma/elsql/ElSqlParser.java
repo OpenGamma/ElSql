@@ -282,11 +282,11 @@ final class ElSqlParser {
     if (text == null) {
       return null;
     }
-    text = text.trim();
-    if (text.startsWith("=")) {
-      return extractVariable(text.substring(1));
+    String trimmed = text.trim();
+    if (trimmed.startsWith("=")) {
+      return extractVariable(trimmed.substring(1));
     }
-    return text;
+    return trimmed;
   }
 
   /**

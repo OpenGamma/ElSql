@@ -5,18 +5,18 @@
  */
 package com.opengamma.elsql;
 
-import static org.testng.AssertJUnit.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 import com.opengamma.elsql.ElSqlParser.Line;
 
 /**
  * Test.
  */
-@Test
 public class LineTest {
 
+  @Test
   public void test_simple() {
     Line line = new Line("LINE", 1);
     assertEquals("LINE", line.line());
@@ -27,6 +27,7 @@ public class LineTest {
     assertEquals(0, line.indent());
   }
 
+  @Test
   public void test_simple_indent() {
     Line line = new Line("  LINE", 2);
     assertEquals("  LINE", line.line());
@@ -37,6 +38,7 @@ public class LineTest {
     assertEquals(2, line.indent());
   }
 
+  @Test
   public void test_comment() {
     Line line = new Line("--", 1);
     assertEquals("--", line.line());
@@ -47,6 +49,7 @@ public class LineTest {
     assertEquals(0, line.indent());
   }
 
+  @Test
   public void test_comment_indent() {
     Line line = new Line("  -- comment", 2);
     assertEquals("  -- comment", line.line());
@@ -57,6 +60,7 @@ public class LineTest {
     assertEquals(2, line.indent());
   }
 
+  @Test
   public void test_trailingComment_indent() {
     Line line = new Line("  SELECT * FROM foo  -- comment", 2);
     assertEquals("  SELECT * FROM foo  -- comment", line.line());
@@ -67,6 +71,7 @@ public class LineTest {
     assertEquals(2, line.indent());
   }
 
+  @Test
   public void test_tab() {
     Line line = new Line("\t@ADD(:Test)", 2);
     assertEquals("\t@ADD(:Test)", line.line());

@@ -5,19 +5,20 @@
  */
 package com.opengamma.elsql;
 
-import static org.testng.AssertJUnit.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test.
  */
-@Test
 public class MapSqlParamsTest {
 
+  @Test
   public void test_constructor_Map() {
     Map<String, Object> map = new HashMap<String, Object>();
     map.put("a", "b");
@@ -26,12 +27,13 @@ public class MapSqlParamsTest {
     assertEquals("b", test.get("a"));
   }
 
-  @Test(expectedExceptions = IllegalArgumentException.class)
+  @Test
   public void test_constructor_Map_null() {
-    new MapSqlParams(null);
+    assertThrows(IllegalArgumentException.class, () -> new MapSqlParams(null));
   }
 
   //-------------------------------------------------------------------------
+  @Test
   public void test_constructor_KeyValue() {
     MapSqlParams test = new MapSqlParams("a", "b");
     assertEquals(true, test.contains("a"));
@@ -39,6 +41,7 @@ public class MapSqlParamsTest {
   }
 
   //-------------------------------------------------------------------------
+  @Test
   public void test_with() {
     MapSqlParams test = new MapSqlParams(new HashMap<String, Object>());
     assertEquals(false, test.contains("a"));

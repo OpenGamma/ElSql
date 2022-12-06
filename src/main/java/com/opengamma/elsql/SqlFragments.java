@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -57,9 +58,7 @@ final class SqlFragments {
 
   // convert a resource to a list of lines
   static List<String> loadResource(URL resource) {
-    InputStream in = null;
-    try {
-      in = resource.openStream();
+    try (InputStream in = resource.openStream()) {
       BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
       List<String> list = new ArrayList<String>();
       String line = reader.readLine();
@@ -69,14 +68,7 @@ final class SqlFragments {
       }
       return list;
     } catch (IOException ex) {
-      throw new RuntimeException(ex);
-    } finally {
-      try {
-        if (in != null) {
-          in.close();
-        }
-      } catch (IOException ignored) {
-      }
+      throw new UncheckedIOException(ex);
     }
   }
 
