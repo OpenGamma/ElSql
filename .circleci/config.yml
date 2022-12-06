@@ -1,0 +1,336 @@
+version: 2.1
+
+#############################################################################
+# execution environment
+executors:
+
+#----------------------------------------------------------------------------
+# vital to set the MaxRAM parameter as cgroups settings are not passed to the JVM
+  jdk8:
+    docker:
+      - image: cimg/openjdk:8.0
+    working_directory: ~/repo
+    environment:
+      JAVA_TOOL_OPTIONS: -XX:MaxRAM=3572m
+      MAVEN_OPTS: -Xmx1g
+
+#----------------------------------------------------------------------------
+  jdk11:
+    docker:
+      - image: cimg/openjdk:11.0
+    working_directory: ~/repo
+    environment:
+      JAVA_TOOL_OPTIONS: -XX:MaxRAM=3572m
+      MAVEN_OPTS: -Xmx1g
+
+#----------------------------------------------------------------------------
+  jdk17:
+    docker:
+      - image: cimg/openjdk:17.0
+    working_directory: ~/repo
+    environment:
+      JAVA_TOOL_OPTIONS: -XX:MaxRAM=3572m
+      MAVEN_OPTS: -Xmx1g
+
+
+#############################################################################
+# reusable commands
+commands:
+
+#----------------------------------------------------------------------------
+# all uses of mvn will be passed these command line arguments
+  init_maven:
+    description: "Initializing Maven"
+    steps:
+      - run:
+          name: Initializing Maven
+          command: |
+            mkdir -p ./.mvn
+            echo "-e -B -DtrimStackTrace=false --settings $( pwd )/.circleci/maven-settings.xml" > ./.mvn/maven.config
+            cat ./.mvn/maven.config
+            mvn --version
+
+#----------------------------------------------------------------------------
+  maven_install:
+    description: "Maven install"
+    steps:
+      - run:
+          name: Maven install (no tests)
+          command: mvn install -T 4 -DskipTests -Dstrict
+
+#----------------------------------------------------------------------------
+  maven_test:
+    description: "Maven test"
+    steps:
+      - run:
+          name: Maven run tests
+          command: mvn test -T 3 -Dcheckstyle.skip=true
+      - store_maven_tests
+
+#----------------------------------------------------------------------------
+  maven_release:
+    description: "Maven release"
+    steps:
+      - run:
+          name: Triggering release of new version
+          command: |
+            RELEASE_SHA=$(git rev-parse HEAD)
+            git checkout main
+            MASTER_SHA=$(git rev-parse HEAD)
+            if [[ "$RELEASE_SHA" != "$MASTER_SHA" ]]; then
+              echo "release tag SHA != main HEAD SHA, $RELEASE_SHA $MASTER_SHA"
+              exit 1
+            fi
+            git config --local user.email "cibot@opengamma.com"
+            git config --local user.name "opengammacibot"
+            mvn release:prepare release:clean
+      - run:
+          name: Deleting release tag
+          command: |
+            git tag --delete $CIRCLE_TAG
+            git push --delete origin $CIRCLE_TAG
+          when: always
+
+#----------------------------------------------------------------------------
+  restore_maven_cache:
+    description: "Restoring Maven cache"
+    steps:
+      - restore_cache:
+          name: "Restoring Maven cache"
+          keys:
+            - mvn-repo-v{{ .Environment.CACHE_VERSION }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "pom.xml" }}
+            - mvn-repo-v{{ .Environment.CACHE_VERSION }}-{{ .Environment.CIRCLE_JOB }}
+            - mvn-repo-v{{ .Environment.CACHE_VERSION }}-
+      - run:
+          name: Maven take dependencies local
+          command: mvn de.qaware.maven:go-offline-maven-plugin:1.1.0:resolve-dependencies
+
+#----------------------------------------------------------------------------
+  store_maven_cache:
+    description: "Storing Maven cache"
+    steps:
+      - save_cache:
+          name: "Storing Maven cache"
+          key: mvn-repo-v{{ .Environment.CACHE_VERSION }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "pom.xml" }}
+          paths:
+            - ~/.m2/repository
+
+#----------------------------------------------------------------------------
+# gather the test result xml files into a single folder and upload them
+  store_maven_tests:
+    description: "Storing Maven test results"
+    steps:
+      - run:
+          name: Gathering test results
+          command: |
+            mkdir -p ~/test-results/junit/
+            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/test-results/junit/ \;
+            zip -rq ~/test-results.zip pom.xml ~/test-results
+          when: always
+      - store_test_results:
+          name: "Uploading test results"
+          path: ~/test-results
+          when: always
+      - store_artifacts:
+          name: "Storing test artifacts"
+          path: ~/test-results.zip
+          destination: test-results
+          when: always
+
+#----------------------------------------------------------------------------
+  with_maven:
+    description: "Performs actions with Maven"
+    parameters:
+      actions:
+        type: steps
+    steps:
+      - init_maven
+      - restore_maven_cache
+      - steps: << parameters.actions >>
+      - store_maven_cache
+
+#----------------------------------------------------------------------------
+  find_version:
+    description: "Finding project version"
+    steps:
+      - run:
+          name: Finding project version
+          command: |
+            PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+            echo "Found version ${PROJECT_VERSION}"
+            echo "export POM_VERSION=$PROJECT_VERSION" >> $BASH_ENV
+
+#----------------------------------------------------------------------------
+# this works with gpg v2.1 as currently installed on CircleCI
+  setup_gpg:
+    description: "Setup GPG"
+    steps:
+      - run:
+          name: Setup GPG
+          working_directory: ~/repo/.circleci
+          command: |
+            gpg --version
+            echo $SIGNING_PASSWORD | gpg --batch --passphrase-fd 0 -o codesigning.asc -d codesigning.asc.gpg
+            gpg --batch --import codesigning.asc
+            shred --remove codesigning.asc
+            echo 'use-agent' >> ~/.gnupg/gpg.conf
+            echo 'pinentry-mode loopback' >> ~/.gnupg/gpg.conf
+            echo 'allow-loopback-pinentry' >> ~/.gnupg/gpg-agent.conf
+
+#----------------------------------------------------------------------------
+  maven_deploy_modules:
+    description: "Maven deploy modules"
+    steps:
+      - run:
+          name: Maven deploy modules
+          working_directory: ~/repo/modules
+          command: mvn deploy -Ddist -Doss.repo -DskipTests -Dcheckstyle.skip=true
+
+#----------------------------------------------------------------------------
+  maven_package_examples:
+    description: "Maven package examples"
+    steps:
+      - run:
+          name: Maven package examples
+          working_directory: ~/repo/examples
+          command: mvn package -Ddist -DskipTests -Dcheckstyle.skip=true
+
+#----------------------------------------------------------------------------
+  maven_package_root:
+    description: "Maven package root"
+    steps:
+      - run:
+          name: Maven package root
+          command: |
+            ls -l examples/target
+            ls -l modules/report/target/dependency
+            mvn package -N -X -Ddist -DskipTests -Dcheckstyle.skip=true
+
+#----------------------------------------------------------------------------
+  maven_github_releases:
+    description: "Deploy files to GitHub Releases"
+    steps:
+      - run:
+          name: Deploy to GitHub releases
+          command: mvn github-release:github-release -N -Dghdeploy
+
+
+#############################################################################
+# jobs to run
+jobs:
+  build:
+    executor: jdk8
+    steps:
+      - checkout
+      - with_maven:
+          actions:
+            - maven_install
+            - maven_test
+            - find_version
+
+  build11:
+    executor: jdk11
+    steps:
+      - checkout
+      - with_maven:
+          actions:
+            - maven_install
+            - maven_test
+
+  build17:
+    executor: jdk17
+    steps:
+      - checkout
+      - with_maven:
+          actions:
+            - maven_install
+            - maven_test
+
+#----------------------------------------------------------------------------
+  release:
+    executor: jdk8
+    steps:
+      - checkout
+      - with_maven:
+          actions:
+            - maven_install
+            - maven_test
+      - persist_to_workspace:
+          root: .
+          paths:
+            - examples/*
+            - modules/*
+            - target/*
+
+#----------------------------------------------------------------------------
+  release_part2:
+    executor: jdk8
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - with_maven:
+          actions:
+            - setup_gpg
+            - maven_deploy_modules
+            - maven_package_examples
+            - maven_package_root
+            - maven_github_releases
+
+#----------------------------------------------------------------------------
+  trigger_release:
+    executor: jdk8
+    steps:
+      - checkout
+      - with_maven:
+          actions:
+            - maven_release
+
+
+#############################################################################
+# workflow elements
+workflows:
+
+#----------------------------------------------------------------------------
+# main build, runs for branches
+  build:
+    jobs:
+      - build:
+          context: OG-OSS
+      - build11:
+          context: OG-OSS
+      - build17:
+          context: OG-OSS
+
+#----------------------------------------------------------------------------
+# release based on a tag
+  release:
+    jobs:
+      - release:
+          context: OG-OSS
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - release_part2:
+          context: OG-OSS
+          requires:
+            - release
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+
+#----------------------------------------------------------------------------
+# uses mvn release to produce a new version, only for release tag
+  trigger_release:
+    jobs:
+      - trigger_release:
+          context: OG-OSS
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^release.*/
